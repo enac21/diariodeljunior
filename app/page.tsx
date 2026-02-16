@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CharacterSVG, rutaAsset, type Seleccion } from "@/src/components/CharacterSVG";
+import { CharacterSVG, rutaAsset, type Seleccion } from "@/components/CharacterSVG";
 
 export const runtime = "nodejs"
 

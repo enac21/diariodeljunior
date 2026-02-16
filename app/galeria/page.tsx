@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { CharacterSVG } from '@/src/components/CharacterSVG';
-import type { Seleccion } from '@/src/lib/character-generator';
+import { CharacterSVG } from '@/components/CharacterSVG';
+import type { Seleccion } from '@/lib/character-generator';
 
 export const runtime = "nodejs"
 

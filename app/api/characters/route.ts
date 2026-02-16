@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { stringToSeed, seleccionarPartes } from '@/src/lib/character-generator';
+import { stringToSeed, seleccionarPartes } from '@/lib/character-generator';
 
 export async function POST(request: NextRequest) {
   try {
