@@ -1,5 +1,5 @@
 {
-  "name": "my-project",
+  "name": "modular_model_generator",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.4.0",
     "@prisma/client": "^7.0.0",
     "dotenv": "^16.4.5",
     "next": "16.1.6",
@@ -22,8 +23,8 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.5",
     "prisma": "^7.0.0",
-    "tailwindcss-animate": "^1.0.7",
     "tailwindcss": "^3.4.17",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "5.7.3"
   },
   "pnpm": {

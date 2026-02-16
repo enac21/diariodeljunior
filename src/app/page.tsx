@@ -1,69 +1,71 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { CharacterSVG, rutaAsset, type Seleccion } from "@/src/components/CharacterSVG";
 
-// ─── Seeded Pseudo-Random Number Generator ───────────────────────────────────
-function createSeededRandom(seed: number) {
-  let state = seed % 2147483647;
-  if (state <= 0) state += 2147483646;
+export const runtime = "nodejs"
 
-  return function next(): number {
-    state = (state * 16807) % 2147483647;
-    return (state - 1) / 2147483646;
-  };
+interface Character {
+  id: string;
+  username: string;
+  seed: number;
+  selectedParts: Seleccion;
+  generatorVersion: number;
+  createdAt: string;
 }
 
-function stringToSeed(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
-// ─── Partes del personaje ────────────────────────────────────────────────────
-const VARIANTES = 5;
-
-function seleccionarPartes(seed: number): Seleccion {
-  const rand = createSeededRandom(seed);
-  const pick = () => Math.floor(rand() * VARIANTES) + 1;
-
-  return {
-    cuerpo: pick(),
-    ojos: pick(),
-    boca: pick(),
-    nariz: pick(),
-    cabeza: pick(),
-    pies: pick(),
-  };
-}
-
-// ─── Pagina principal ────────────────────────────────────────────────────────
 export default function Page() {
   const [inputId, setInputId] = useState("");
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleGenerate = () => {
-    if (inputId.trim()) {
-      setActiveId(inputId.trim());
+  const handleGenerate = async () => {
+    if (!inputId.trim()) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/characters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: inputId.trim() }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Error al crear el personaje');
+      }
+
+      const data = await res.json();
+      setCharacter(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
     }
   };
-
-  const seed = activeId ? stringToSeed(activeId) : null;
-  const seleccion = seed !== null ? seleccionarPartes(seed) : null;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-muted p-4">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-lg">
-        <h1 className="mb-1 text-center text-2xl font-bold tracking-tight text-card-foreground">
-          Generador de Personajes
-        </h1>
-        <p className="mb-6 text-center text-sm text-muted-foreground">
-          Ingresa un ID para generar un personaje procedimental unico
-        </p>
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-card-foreground">
+              Generador de Personajes
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Ingresa un ID para generar un personaje procedimental único
+            </p>
+          </div>
+          <Link
+            href="/galeria"
+            className="rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+          >
+            Galería
+          </Link>
+        </div>
 
         <form
           onSubmit={(e) => {
@@ -82,17 +84,23 @@ export default function Page() {
           />
           <button
             type="submit"
-            disabled={!inputId.trim()}
+            disabled={!inputId.trim() || loading}
             className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Generar
+            {loading ? 'Generando...' : 'Generar'}
           </button>
         </form>
 
-        {seleccion && activeId && (
+        {error && (
+          <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+
+        {character && (
           <div className="flex flex-col items-center gap-4">
             <div className="rounded-xl border border-border bg-background p-4">
-              <CharacterSVG seleccion={seleccion} activeId={activeId} />
+              <CharacterSVG seleccion={character.selectedParts} activeId={character.username} />
             </div>
 
             <details className="w-full">
@@ -102,14 +110,14 @@ export default function Page() {
               <pre className="mt-2 overflow-x-auto rounded-lg bg-muted p-4 text-xs text-muted-foreground">
                 {JSON.stringify(
                   {
-                    id: activeId,
-                    seed: seed,
-                    cuerpo: { variante: seleccion.cuerpo, archivo: rutaAsset("cuerpo", seleccion.cuerpo) },
-                    ojos: { variante: seleccion.ojos, archivo: rutaAsset("ojos", seleccion.ojos) },
-                    boca: { variante: seleccion.boca, archivo: rutaAsset("boca", seleccion.boca) },
-                    nariz: { variante: seleccion.nariz, archivo: rutaAsset("nariz", seleccion.nariz) },
-                    cabeza: { variante: seleccion.cabeza, archivo: rutaAsset("cabeza", seleccion.cabeza) },
-                    pies: { variante: seleccion.pies, archivo: rutaAsset("pies", seleccion.pies) },
+                    id: character.username,
+                    seed: character.seed,
+                    cuerpo: { variante: character.selectedParts.cuerpo, archivo: rutaAsset("cuerpo", character.selectedParts.cuerpo) },
+                    ojos: { variante: character.selectedParts.ojos, archivo: rutaAsset("ojos", character.selectedParts.ojos) },
+                    boca: { variante: character.selectedParts.boca, archivo: rutaAsset("boca", character.selectedParts.boca) },
+                    nariz: { variante: character.selectedParts.nariz, archivo: rutaAsset("nariz", character.selectedParts.nariz) },
+                    cabeza: { variante: character.selectedParts.cabeza, archivo: rutaAsset("cabeza", character.selectedParts.cabeza) },
+                    pies: { variante: character.selectedParts.pies, archivo: rutaAsset("pies", character.selectedParts.pies) },
                   },
                   null,
                   2
@@ -119,7 +127,7 @@ export default function Page() {
           </div>
         )}
 
-        {!seleccion && (
+        {!character && !loading && (
           <div className="flex flex-col items-center gap-2 py-12 text-muted-foreground">
             <svg viewBox="0 0 300 300" width={120} height={120} className="opacity-20">
               <ellipse cx={150} cy={190} rx={60} ry={70} fill="currentColor" />
