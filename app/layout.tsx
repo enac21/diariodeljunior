@@ -1,14 +1,21 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-
 import './globals.css'
 
-const _geist = Geist({ subsets: ['latin'] })
-const _geistMono = Geist_Mono({ subsets: ['latin'] })
+const geist = Geist({ 
+  subsets: ['latin'],
+  variable: '--font-geist',
+})
+
+const geistMono = Geist_Mono({ 
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+})
 
 export const metadata: Metadata = {
-  title: 'Generador de Personajes Procedimental',
-  description: 'Genera personajes SVG unicos a partir de cualquier ID usando aleatoriedad con semilla',
+  title: 'Character Forge - Generador de Personajes Procedimental',
+  description: 'Genera personajes SVG únicos a partir de cualquier ID usando aleatoriedad con semilla. Explora el mapa de personajes.',
+  keywords: ['procedural', 'character generator', 'SVG', 'random', 'seed'],
 }
 
 export default function RootLayout({
@@ -17,8 +24,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es">
-      <body className="font-sans antialiased">{children}</body>
+    <html lang="es" className="dark">
+      <body className={`${geist.variable} ${geistMono.variable} font-sans`}>
+        {children}
+      </body>
     </html>
   )
 }

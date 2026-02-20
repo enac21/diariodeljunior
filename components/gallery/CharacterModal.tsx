@@ -35,16 +35,16 @@ export function CharacterModal({ character, onClose }: CharacterModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md"
       onClick={onClose}
     >
       <div
-        className="relative max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl"
+        className="relative max-w-md rounded-2xl border border-border/50 bg-card/95 backdrop-blur-xl p-6 shadow-2xl shadow-primary/5 animate-scale-in"
         onClick={e => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -52,22 +52,27 @@ export function CharacterModal({ character, onClose }: CharacterModalProps) {
         </button>
 
         <div className="flex flex-col items-center">
-          <div className="rounded-xl bg-background p-4">
-            <CharacterSVG
-              seleccion={character.selectedParts}
-              activeId={character.username}
-            />
+          <div className="relative">
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 blur-xl" />
+            <div className="relative rounded-xl border border-border/50 bg-background/50 p-4">
+              <CharacterSVG
+                seleccion={character.selectedParts}
+                activeId={character.username}
+              />
+            </div>
           </div>
           
-          <div className="mt-4 text-center">
-            <h2 className="text-xl font-bold text-card-foreground">
+          <div className="mt-5 text-center">
+            <h2 className="text-xl font-bold text-foreground">
               {character.username}
             </h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Seed: {character.seed}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Creado: {new Date(character.createdAt).toLocaleDateString('es-ES', {
+            <div className="mt-3 flex items-center justify-center gap-4 text-sm">
+              <div className="rounded-lg bg-muted/50 px-3 py-1.5 font-mono text-muted-foreground">
+                seed: <span className="text-foreground">{character.seed}</span>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              {new Date(character.createdAt).toLocaleDateString('es-ES', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
