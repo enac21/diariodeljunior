@@ -48,12 +48,20 @@ export default async function GaleriaPage() {
               {characters.length} personajes únicos creados
             </p>
           </div>
-          <Link
-            href="/"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Crear Personaje
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/galeriav2"
+              className="rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+            >
+              Mapa Interactivo
+            </Link>
+            <Link
+              href="/"
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Crear Personaje
+            </Link>
+          </div>
         </div>
 
         {characters.length === 0 ? (

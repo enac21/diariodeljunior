@@ -12,3 +12,7 @@ node_modules/
 
 # Prisma
 generated
+
+# IDEs
+.idea
+.vscode

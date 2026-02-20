@@ -59,12 +59,20 @@ export default function Page() {
               Ingresa un ID para generar un personaje procedimental único
             </p>
           </div>
-          <Link
-            href="/galeria"
-            className="rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
-          >
-            Galería
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/galeriav2"
+              className="rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+            >
+              Mapa
+            </Link>
+            <Link
+              href="/galeria"
+              className="rounded-lg bg-secondary px-3 py-2 text-xs font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
+            >
+              Galería
+            </Link>
+          </div>
         </div>
 
         <form
