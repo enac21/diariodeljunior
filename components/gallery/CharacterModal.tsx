@@ -44,9 +44,9 @@ export function CharacterModal({ character, onClose }: CharacterModalProps) {
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+          className="absolute -right-3 -top-3 flex h-8 w-8 items-center justify-center rounded-full bg-card border border-border text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>
