@@ -13,11 +13,16 @@ interface Character {
   createdAt: string;
 }
 
-async function getCharacters() {
+interface GaleriaData {
+  characters: Character[];
+  total: number;
+}
+
+async function getCharacters(): Promise<GaleriaData> {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
   
   try {
-    const res = await fetch(`${baseUrl}/api/characters?limit=100`, {
+    const res = await fetch(`${baseUrl}/api/characters?limit=9999`, {
       cache: 'no-store',
     });
     
@@ -26,15 +31,18 @@ async function getCharacters() {
     }
     
     const data = await res.json();
-    return data.characters as Character[];
+    return {
+      characters: data.characters as Character[],
+      total: data.total || data.characters.length,
+    };
   } catch (error) {
     console.error('Error fetching characters:', error);
-    return [];
+    return { characters: [], total: 0 };
   }
 }
 
 export default async function GaleriaPage() {
-  const characters = await getCharacters();
+  const { characters, total } = await getCharacters();
 
   return (
     <main className="min-h-screen bg-muted p-8">
@@ -45,7 +53,7 @@ export default async function GaleriaPage() {
               Galería de Personajes
             </h1>
             <p className="mt-2 text-muted-foreground">
-              {characters.length} personajes únicos creados
+              {total} personajes únicos creados
             </p>
           </div>
           <div className="flex gap-2">
