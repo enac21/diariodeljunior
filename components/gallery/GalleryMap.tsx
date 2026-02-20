@@ -158,24 +158,19 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     const nameText = new Text({
       text: character.username,
       style: { 
-        fontSize: 18, 
+        fontSize: 14, 
         fill: 0xffffff, 
         fontFamily: 'system-ui, sans-serif',
         fontWeight: '500'
       }
     });
     nameText.x = -nameText.width / 2;
-    nameText.y = -CHARACTER_SIZE / 2 - 30;
+    nameText.y = -CHARACTER_SIZE / 2 - 24;
+    nameText.alpha = 0.8;
     wrapper.addChild(nameText);
     
     const charContainer = new Container();
-    charContainer.y = 10;
     wrapper.addChild(charContainer);
-    
-    const bg = new Graphics();
-    bg.roundRect(-CHARACTER_SIZE / 2 - 8, -CHARACTER_SIZE / 2 - 8, CHARACTER_SIZE + 16, CHARACTER_SIZE + 16, 12);
-    bg.fill({ color: 0x2a2118, alpha: 0.9 });
-    charContainer.addChild(bg);
     
     for (const parte of PARTES) {
       try {
@@ -196,15 +191,11 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     });
     
     wrapper.on('pointerover', () => {
-      bg.clear();
-      bg.roundRect(-CHARACTER_SIZE / 2 - 8, -CHARACTER_SIZE / 2 - 8, CHARACTER_SIZE + 16, CHARACTER_SIZE + 16, 12);
-      bg.fill({ color: 0x3a2d22, alpha: 0.95 });
+      nameText.alpha = 1;
     });
     
     wrapper.on('pointerout', () => {
-      bg.clear();
-      bg.roundRect(-CHARACTER_SIZE / 2 - 8, -CHARACTER_SIZE / 2 - 8, CHARACTER_SIZE + 16, CHARACTER_SIZE + 16, 12);
-      bg.fill({ color: 0x2a2118, alpha: 0.9 });
+      nameText.alpha = 0.8;
     });
     
     characterContainerCache.set(cacheKey, wrapper);
@@ -503,7 +494,7 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
           e.preventDefault();
           
           const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-          const newScale = Math.max(0.5, Math.min(1.5, worldContainer.scale.x * zoomFactor));
+          const newScale = Math.max(0.15, Math.min(1.5, worldContainer.scale.x * zoomFactor));
           
           const mouseX = e.clientX - app.canvas.getBoundingClientRect().left;
           const mouseY = e.clientY - app.canvas.getBoundingClientRect().top;

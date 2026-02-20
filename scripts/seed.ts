@@ -9,7 +9,8 @@ const adapter = new PrismaPg({
 
 const prisma = new PrismaClient({ adapter })
 
-const CHARACTER_COUNT = 200
+const DEFAULT_COUNT = 200
+const count = parseInt(process.argv[2]) || DEFAULT_COUNT
 
 const adjectives = [
   'Brave', 'Clever', 'Swift', 'Mighty', 'Gentle', 'Fierce', 'Noble', 'Wild',
@@ -31,11 +32,11 @@ function generateUsername(index: number): string {
 }
 
 async function main() {
-  console.log(`Seeding ${CHARACTER_COUNT} characters...`)
+  console.log(`Seeding ${count} characters...`)
   
   const characters: any[] = []
   
-  for (let i = 0; i < CHARACTER_COUNT; i++) {
+  for (let i = 0; i < count; i++) {
     const username = generateUsername(i)
     const seed = stringToSeed(username)
     const selectedParts = seleccionarPartes(seed)
