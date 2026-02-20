@@ -517,9 +517,14 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
       console.log('[GalleryMap] Cleanup');
       mounted = false;
       if (appRef.current) {
-        appRef.current.destroy(true, { children: true, texture: true });
+        appRef.current.destroy(true, { children: true, texture: false });
         appRef.current = null;
       }
+      characterContainerCache.clear();
+      renderedIndicesRef.current.clear();
+      charactersDataRef.current.clear();
+      loadedRangesRef.current = [];
+      totalRef.current = 0;
     };
   }, [fetchCharactersRange, updateVisibleCharacters]);
 
