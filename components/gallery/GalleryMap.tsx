@@ -174,7 +174,7 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     
     const bg = new Graphics();
     bg.roundRect(-CHARACTER_SIZE / 2 - 8, -CHARACTER_SIZE / 2 - 8, CHARACTER_SIZE + 16, CHARACTER_SIZE + 16, 12);
-    bg.fill({ color: 0x1e293b, alpha: 0.85 });
+    bg.fill({ color: 0x2a2118, alpha: 0.9 });
     charContainer.addChild(bg);
     
     for (const parte of PARTES) {
@@ -198,13 +198,13 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     wrapper.on('pointerover', () => {
       bg.clear();
       bg.roundRect(-CHARACTER_SIZE / 2 - 8, -CHARACTER_SIZE / 2 - 8, CHARACTER_SIZE + 16, CHARACTER_SIZE + 16, 12);
-      bg.fill({ color: 0x334155, alpha: 0.95 });
+      bg.fill({ color: 0x3a2d22, alpha: 0.95 });
     });
     
     wrapper.on('pointerout', () => {
       bg.clear();
       bg.roundRect(-CHARACTER_SIZE / 2 - 8, -CHARACTER_SIZE / 2 - 8, CHARACTER_SIZE + 16, CHARACTER_SIZE + 16, 12);
-      bg.fill({ color: 0x1e293b, alpha: 0.85 });
+      bg.fill({ color: 0x2a2118, alpha: 0.9 });
     });
     
     characterContainerCache.set(cacheKey, wrapper);
@@ -261,7 +261,17 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
       if (character) {
         const child = charactersContainer.children.find(c => c.label === `character-${character.id}`);
         if (child) {
-          charactersContainer.removeChild(child);
+          let alpha = 1;
+          const fadeOut = () => {
+            alpha -= 0.1;
+            if (alpha <= 0) {
+              charactersContainer.removeChild(child);
+            } else {
+              child.alpha = alpha;
+              requestAnimationFrame(fadeOut);
+            }
+          };
+          requestAnimationFrame(fadeOut);
         }
       }
       renderedIndicesRef.current.delete(index);
@@ -306,8 +316,21 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
         
         try {
           const container = await createCharacterContainer(character, index);
+          container.alpha = 0;
           charactersContainer.addChild(container);
           renderedIndicesRef.current.add(index);
+          
+          let alpha = 0;
+          const fadeIn = () => {
+            alpha += 0.1;
+            if (alpha >= 1) {
+              container.alpha = 1;
+            } else {
+              container.alpha = alpha;
+              requestAnimationFrame(fadeIn);
+            }
+          };
+          requestAnimationFrame(fadeIn);
           
           const charEndTime = performance.now();
           console.log(`[TODO: Remove] Character "${character.username}" (ring ${circlePosition(index, INITIAL_RADIUS).ring}, pos ${index}) rendered in ${(charEndTime - charStartTime).toFixed(2)}ms`);
@@ -371,7 +394,7 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
         const app = new Application();
         
         await app.init({
-          background: '#0f172a',
+          background: '#1a1612',
           resizeTo: container!,
           antialias: true,
           resolution: window.devicePixelRatio || 1,
@@ -408,7 +431,7 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
             text: '0, 0',
             style: { 
               fontSize: 24, 
-              fill: 0x6366f1, 
+              fill: 0xF97316, 
               fontFamily: 'monospace',
               fontWeight: 'bold'
             }
@@ -532,28 +555,28 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
   }, [fetchCharactersRange, updateVisibleCharacters]);
 
   return (
-    <div ref={containerRef} className="relative h-full w-full bg-slate-900">
+    <div ref={containerRef} className="relative h-full w-full bg-background">
       {loading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background">
           <div className="flex flex-col items-center gap-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
-            <p className="text-slate-400">Cargando mapa...</p>
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+            <p className="text-muted-foreground">Cargando mapa...</p>
           </div>
         </div>
       )}
       
       {error && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900">
-          <p className="text-red-400">{error}</p>
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-background">
+          <p className="text-destructive">{error}</p>
         </div>
       )}
       
       {!loading && !error && (
-        <div className="pointer-events-none absolute bottom-4 left-4 z-10 rounded-lg bg-black/60 px-4 py-3 text-sm text-white/80 backdrop-blur-sm">
-          <div className="font-mono">Zoom: {zoom}%</div>
-          <div className="font-mono">Personajes: {total}</div>
-          <div className="font-mono">Visibles: {visibleCount}</div>
-          <div className="mt-2 text-xs text-white/50">
+        <div className="pointer-events-none absolute bottom-4 left-4 z-10 rounded-xl border border-border/50 bg-card/80 px-4 py-3 text-sm text-foreground backdrop-blur-sm">
+          <div className="font-mono text-muted-foreground">Zoom: <span className="text-foreground">{zoom}%</span></div>
+          <div className="font-mono text-muted-foreground">Personajes: <span className="text-foreground">{total}</span></div>
+          <div className="font-mono text-muted-foreground">Visibles: <span className="text-primary">{visibleCount}</span></div>
+          <div className="mt-2 text-xs text-muted-foreground">
             Rueda: zoom | Arrastrar: mover | Click: ver detalle
           </div>
         </div>
