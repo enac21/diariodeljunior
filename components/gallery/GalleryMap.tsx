@@ -348,13 +348,16 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
       console.log('[GalleryMap] Starting initialization...');
       
       try {
-        const { total: fetchedTotal } = await fetchCharactersRange(0, 1);
-        console.log(`[GalleryMap] Fetched initial total: ${fetchedTotal}`);
-        
-        if (!mounted) return;
-        
-        totalRef.current = fetchedTotal;
-        setTotal(fetchedTotal);
+        const res = await fetch('/api/characters/count');
+        if (res.ok) {
+          const { total: fetchedTotal } = await res.json();
+          console.log(`[GalleryMap] Fetched initial total: ${fetchedTotal}`);
+          
+          if (!mounted) return;
+          
+          totalRef.current = fetchedTotal;
+          setTotal(fetchedTotal);
+        }
       } catch (e) {
         console.error('[GalleryMap] Error fetching initial total:', e);
         if (!mounted) return;
