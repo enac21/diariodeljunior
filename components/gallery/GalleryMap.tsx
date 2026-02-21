@@ -73,6 +73,11 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
   const loadingBatchRef = useRef(false);
   const loadedRangesRef = useRef<Array<{ start: number; end: number }>>([]);
   const onCharacterClickRef = useRef(onCharacterClick);
+  const lastTouchDistanceRef = useRef(0);
+  const lastTouchCenterRef = useRef({ x: 0, y: 0 });
+  const lastScaleRef = useRef(1);
+  const isPinchingRef = useRef(false);
+  const worldContainerRefForZoom = useRef<Container | null>(null);
 
   useEffect(() => {
     onCharacterClickRef.current = onCharacterClick;
@@ -143,7 +148,9 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     const cacheKey = character.id;
     
     if (characterContainerCache.has(cacheKey)) {
-      return characterContainerCache.get(cacheKey)!;
+      const cached = characterContainerCache.get(cacheKey)!;
+      cached.alpha = 1;
+      return cached;
     }
     
     const pos = circlePosition(index, INITIAL_RADIUS);
@@ -187,7 +194,9 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     }
     
     wrapper.on('pointerdown', () => {
-      onCharacterClickRef.current(character);
+      if (!isPinchingRef.current) {
+        onCharacterClickRef.current(character);
+      }
     });
     
     wrapper.on('pointerover', () => {
@@ -254,7 +263,7 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
         if (child) {
           let alpha = 1;
           const fadeOut = () => {
-            alpha -= 0.1;
+            alpha -= 0.15;
             if (alpha <= 0) {
               charactersContainer.removeChild(child);
             } else {
@@ -307,13 +316,22 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
         
         try {
           const container = await createCharacterContainer(character, index);
+          
+          const alreadyInStage = charactersContainer.children.includes(container);
+          
+          if (alreadyInStage) {
+            container.alpha = 1;
+            renderedIndicesRef.current.add(index);
+            continue;
+          }
+          
           container.alpha = 0;
           charactersContainer.addChild(container);
           renderedIndicesRef.current.add(index);
           
           let alpha = 0;
           const fadeIn = () => {
-            alpha += 0.1;
+            alpha += 0.15;
             if (alpha >= 1) {
               container.alpha = 1;
             } else {
@@ -346,6 +364,28 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     });
     setVisibleCount(finalVisibleCount);
   }, [ensureCharactersLoaded, createCharacterContainer]);
+
+  const handleZoom = useCallback((zoomIn: boolean, centerX?: number, centerY?: number) => {
+    const worldContainer = worldContainerRefForZoom.current;
+    const app = appRef.current;
+    if (!worldContainer || !app) return;
+    
+    const zoomFactor = zoomIn ? 1.2 : 0.8;
+    const newScale = Math.max(0.15, Math.min(1.5, worldContainer.scale.x * zoomFactor));
+    
+    const rect = app.canvas.getBoundingClientRect();
+    const pivotX = centerX ?? rect.width / 2;
+    const pivotY = centerY ?? rect.height / 2;
+    
+    const worldX = (pivotX - worldContainer.x) / worldContainer.scale.x;
+    const worldY = (pivotY - worldContainer.y) / worldContainer.scale.y;
+    
+    worldContainer.scale.set(newScale);
+    worldContainer.x = pivotX - worldX * newScale;
+    worldContainer.y = pivotY - worldY * newScale;
+    
+    setZoom(Math.round(newScale * 100));
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -405,6 +445,7 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
         worldContainer.sortableChildren = true;
         app.stage.addChild(worldContainer);
         worldContainerRef.current = worldContainer;
+        worldContainerRefForZoom.current = worldContainer;
         
         const logoContainer = new Container();
         logoContainer.zIndex = 1000;
@@ -519,6 +560,72 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
           }
         }, { passive: false });
         
+        const handleTouchStart = (e: TouchEvent) => {
+          if (e.touches.length === 2) {
+            e.preventDefault();
+            isPinchingRef.current = true;
+            
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            lastTouchDistanceRef.current = Math.sqrt(dx * dx + dy * dy);
+            lastScaleRef.current = worldContainer.scale.x;
+            
+            const rect = app.canvas.getBoundingClientRect();
+            lastTouchCenterRef.current = {
+              x: (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left,
+              y: (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top
+            };
+          }
+        };
+        
+        const handleTouchMove = (e: TouchEvent) => {
+          if (e.touches.length === 2 && isPinchingRef.current) {
+            e.preventDefault();
+            
+            const dx = e.touches[0].clientX - e.touches[1].clientX;
+            const dy = e.touches[0].clientY - e.touches[1].clientY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (lastTouchDistanceRef.current > 0) {
+              const scaleDelta = distance / lastTouchDistanceRef.current;
+              const newScale = Math.max(0.15, Math.min(1.5, lastScaleRef.current * scaleDelta));
+              
+              const centerX = lastTouchCenterRef.current.x;
+              const centerY = lastTouchCenterRef.current.y;
+              
+              const worldX = (centerX - worldContainer.x) / worldContainer.scale.x;
+              const worldY = (centerY - worldContainer.y) / worldContainer.scale.y;
+              
+              worldContainer.scale.set(newScale);
+              worldContainer.x = centerX - worldX * newScale;
+              worldContainer.y = centerY - worldY * newScale;
+              
+              setZoom(Math.round(newScale * 100));
+              
+              if (!updateScheduled) {
+                updateScheduled = true;
+                requestAnimationFrame(() => {
+                  if (appRef.current) {
+                    updateVisibleCharacters(charactersContainer, worldContainer, app.screen.width, app.screen.height);
+                  }
+                  updateScheduled = false;
+                });
+              }
+            }
+          }
+        };
+        
+        const handleTouchEnd = () => {
+          setTimeout(() => {
+            isPinchingRef.current = false;
+          }, 100);
+          lastTouchDistanceRef.current = 0;
+        };
+        
+        app.canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+        app.canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+        app.canvas.addEventListener('touchend', handleTouchEnd);
+        
       } catch (e) {
         console.error('[GalleryMap] Initialization error:', e);
         if (mounted) {
@@ -563,14 +670,47 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
       )}
       
       {!loading && !error && (
-        <div className="pointer-events-none absolute bottom-4 left-4 z-10 rounded-xl border border-border/50 bg-card/80 px-4 py-3 text-sm text-foreground backdrop-blur-sm">
-          <div className="font-mono text-muted-foreground">Zoom: <span className="text-foreground">{zoom}%</span></div>
-          <div className="font-mono text-muted-foreground">Personajes: <span className="text-foreground">{total}</span></div>
-          <div className="font-mono text-muted-foreground">Visibles: <span className="text-primary">{visibleCount}</span></div>
-          <div className="mt-2 text-xs text-muted-foreground">
-            Rueda: zoom | Arrastrar: mover | Click: ver detalle
+        <>
+          <div className="pointer-events-auto absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] left-[calc(1rem+env(safe-area-inset-left))] z-10 flex flex-col gap-2">
+            <button
+              onClick={() => handleZoom(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/50 bg-card/90 text-foreground backdrop-blur-sm transition-all hover:bg-card active:scale-95 md:h-10 md:w-10"
+              aria-label="Zoom in"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+            <button
+              onClick={() => handleZoom(false)}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/50 bg-card/90 text-foreground backdrop-blur-sm transition-all hover:bg-card active:scale-95 md:h-10 md:w-10"
+              aria-label="Zoom out"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 12h14" />
+              </svg>
+            </button>
           </div>
-        </div>
+          
+          <div className="pointer-events-none absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] left-16 right-[calc(1rem+env(safe-area-inset-right))] z-10 flex items-center justify-between rounded-lg border border-border/50 bg-card/80 px-3 py-2 text-xs text-foreground backdrop-blur-sm md:left-20 md:right-auto md:justify-start md:gap-4 md:px-4 md:py-3 md:text-sm">
+            <div className="flex items-center gap-2 md:gap-3">
+              <span className="font-mono text-muted-foreground">
+                <span className="text-foreground">{zoom}%</span>
+              </span>
+              <span className="text-border">|</span>
+              <span className="font-mono text-muted-foreground">
+                <span className="text-foreground">{total}</span> total
+              </span>
+              <span className="text-border">|</span>
+              <span className="font-mono text-muted-foreground">
+                <span className="text-primary">{visibleCount}</span>
+              </span>
+            </div>
+            <div className="hidden text-xs text-muted-foreground md:block">
+              Rueda/pinch: zoom | Arrastrar: mover | Click: detalle
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
