@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Application, Container, FederatedPointerEvent, Text, Graphics, Assets, Sprite, Texture } from 'pixi.js';
 import type { Seleccion } from '@/lib/character-generator';
 import { circlePosition, getRingRange, getVisibleRings } from '@/lib/circle-position';
+import { createAgent, updateAgent, type CharacterAgent } from '@/lib/character-agent';
 
 const PARTES = ['pies', 'cuerpo', 'cabeza', 'ojos', 'nariz', 'boca'] as const;
 type Parte = typeof PARTES[number];
@@ -18,6 +19,7 @@ interface Character {
 
 interface GalleryMapProps {
   onCharacterClick: (character: Character) => void;
+  focusCharacterId: string | null;
 }
 
 const LAYOUT: Record<Parte, { x: number; y: number; width: number; height: number }> = {
@@ -54,7 +56,7 @@ async function loadPartTexture(parte: Parte, variante: number): Promise<Texture>
   return texture;
 }
 
-export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
+export function GalleryMap({ onCharacterClick, focusCharacterId }: GalleryMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const worldContainerRef = useRef<Container | null>(null);
@@ -64,6 +66,7 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
   const [total, setTotal] = useState(0);
   const [zoom, setZoom] = useState(100);
   const [visibleCount, setVisibleCount] = useState(0);
+  const [fps, setFps] = useState(0);
   
   const charactersDataRef = useRef<Map<number, Character>>(new Map());
   const totalRef = useRef(0);
@@ -78,10 +81,48 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
   const lastScaleRef = useRef(1);
   const isPinchingRef = useRef(false);
   const worldContainerRefForZoom = useRef<Container | null>(null);
+  
+  const agentsRef = useRef<Map<number, CharacterAgent>>(new Map());
+  const lastFrameTimeRef = useRef(0);
+  const animationFrameRef = useRef<number | null>(null);
+  const fpsFramesRef = useRef(0);
+  const fpsLastTimeRef = useRef(0);
+  const focusCharacterIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     onCharacterClickRef.current = onCharacterClick;
   }, [onCharacterClick]);
+
+  useEffect(() => {
+    focusCharacterIdRef.current = focusCharacterId;
+    
+    if (!focusCharacterId || !worldContainerRef.current || !appRef.current) return;
+    
+    const worldContainer = worldContainerRef.current;
+    const app = appRef.current;
+    
+    let foundIndex = -1;
+    charactersDataRef.current.forEach((char, index) => {
+      if (char.id === focusCharacterId || char.username.toLowerCase() === focusCharacterId.toLowerCase()) {
+        foundIndex = index;
+      }
+    });
+    
+    if (foundIndex === -1) return;
+    
+    const agent = agentsRef.current.get(foundIndex);
+    if (!agent) {
+      const pos = circlePosition(foundIndex, INITIAL_RADIUS);
+      worldContainer.x = app.screen.width / 2 - pos.x;
+      worldContainer.y = app.screen.height / 2 - pos.y;
+    } else {
+      worldContainer.x = app.screen.width / 2 - agent.x;
+      worldContainer.y = app.screen.height / 2 - agent.y;
+    }
+    
+    worldContainer.scale.set(1);
+    setZoom(100);
+  }, [focusCharacterId]);
 
   const fetchCharactersRange = useCallback(async (startIndex: number, count: number): Promise<{ characters: Character[]; total: number }> => {
     const offset = Math.max(0, startIndex);
@@ -150,14 +191,25 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     if (characterContainerCache.has(cacheKey)) {
       const cached = characterContainerCache.get(cacheKey)!;
       cached.alpha = 1;
+      const agent = agentsRef.current.get(index);
+      if (agent) {
+        cached.x = agent.x;
+        cached.y = agent.y;
+      }
       return cached;
     }
     
     const pos = circlePosition(index, INITIAL_RADIUS);
     
+    if (!agentsRef.current.has(index)) {
+      agentsRef.current.set(index, createAgent(index, pos.x, pos.y));
+    }
+    
+    const agent = agentsRef.current.get(index)!;
+    
     const wrapper = new Container();
-    wrapper.x = pos.x;
-    wrapper.y = pos.y;
+    wrapper.x = agent.x;
+    wrapper.y = agent.y;
     wrapper.eventMode = 'static';
     wrapper.cursor = 'pointer';
     wrapper.label = `character-${character.id}`;
@@ -626,6 +678,49 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
         app.canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
         app.canvas.addEventListener('touchend', handleTouchEnd);
         
+        const animationLoop = (currentTime: number) => {
+          if (!mounted) return;
+          
+          const deltaTime = lastFrameTimeRef.current ? currentTime - lastFrameTimeRef.current : 16;
+          lastFrameTimeRef.current = currentTime;
+          
+          // TODO: Remove FPS counter (testing only)
+          fpsFramesRef.current++;
+          if (currentTime - fpsLastTimeRef.current >= 1000) {
+            setFps(fpsFramesRef.current);
+            fpsFramesRef.current = 0;
+            fpsLastTimeRef.current = currentTime;
+          }
+          
+          const visibleAgents: CharacterAgent[] = [];
+          renderedIndicesRef.current.forEach(index => {
+            const agent = agentsRef.current.get(index);
+            if (agent) visibleAgents.push(agent);
+          });
+          
+          renderedIndicesRef.current.forEach(index => {
+            const agent = agentsRef.current.get(index);
+            if (!agent) return;
+            
+            updateAgent(agent, deltaTime, visibleAgents);
+            
+            const character = charactersDataRef.current.get(index);
+            if (character) {
+              const container = charactersContainer.children.find(
+                c => c.label === `character-${character.id}`
+              );
+              if (container) {
+                container.x = agent.x;
+                container.y = agent.y;
+              }
+            }
+          });
+          
+          animationFrameRef.current = requestAnimationFrame(animationLoop);
+        };
+        
+        animationFrameRef.current = requestAnimationFrame(animationLoop);
+        
       } catch (e) {
         console.error('[GalleryMap] Initialization error:', e);
         if (mounted) {
@@ -640,11 +735,16 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
     return () => {
       console.log('[GalleryMap] Cleanup');
       mounted = false;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
       if (appRef.current) {
         appRef.current.destroy(true, { children: true, texture: false });
         appRef.current = null;
       }
       characterContainerCache.clear();
+      agentsRef.current.clear();
       renderedIndicesRef.current.clear();
       charactersDataRef.current.clear();
       loadedRangesRef.current = [];
@@ -704,6 +804,10 @@ export function GalleryMap({ onCharacterClick }: GalleryMapProps) {
               <span className="text-border">|</span>
               <span className="font-mono text-muted-foreground">
                 <span className="text-primary">{visibleCount}</span>
+              </span>
+              <span className="text-border">|</span>
+              <span className="font-mono text-muted-foreground">
+                <span className="text-amber-400">{fps}</span> fps
               </span>
             </div>
             <div className="hidden text-xs text-muted-foreground md:block">
