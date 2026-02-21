@@ -20,6 +20,7 @@ interface Character {
 interface GalleryMapProps {
   onCharacterClick: (character: Character) => void;
   focusCharacterId: string | null;
+  onLogoClick: () => void;
 }
 
 const LAYOUT: Record<Parte, { x: number; y: number; width: number; height: number }> = {
@@ -32,7 +33,7 @@ const LAYOUT: Record<Parte, { x: number; y: number; width: number; height: numbe
 };
 
 const CHARACTER_SIZE = 280;
-const LOGO_SIZE = 200;
+const LOGO_SIZE = 280;
 const INITIAL_RADIUS = 350;
 const LOAD_PADDING = 400;
 const BATCH_SIZE = 100;
@@ -56,7 +57,7 @@ async function loadPartTexture(parte: Parte, variante: number): Promise<Texture>
   return texture;
 }
 
-export function GalleryMap({ onCharacterClick, focusCharacterId }: GalleryMapProps) {
+export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: GalleryMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const worldContainerRef = useRef<Container | null>(null);
@@ -88,10 +89,16 @@ export function GalleryMap({ onCharacterClick, focusCharacterId }: GalleryMapPro
   const fpsFramesRef = useRef(0);
   const fpsLastTimeRef = useRef(0);
   const focusCharacterIdRef = useRef<string | null>(null);
+  const onLogoClickRef = useRef(onLogoClick);
+  const pulseArrowRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     onCharacterClickRef.current = onCharacterClick;
   }, [onCharacterClick]);
+
+  useEffect(() => {
+    onLogoClickRef.current = onLogoClick;
+  }, [onLogoClick]);
 
   useEffect(() => {
     focusCharacterIdRef.current = focusCharacterId;
@@ -501,6 +508,8 @@ export function GalleryMap({ onCharacterClick, focusCharacterId }: GalleryMapPro
         
         const logoContainer = new Container();
         logoContainer.zIndex = 1000;
+        logoContainer.eventMode = 'static';
+        logoContainer.cursor = 'pointer';
         worldContainer.addChild(logoContainer);
         
         try {
@@ -514,15 +523,83 @@ export function GalleryMap({ onCharacterClick, focusCharacterId }: GalleryMapPro
           const coordText = new Text({
             text: '0, 0',
             style: { 
-              fontSize: 24, 
+              fontSize: 35, 
               fill: 0xF97316, 
               fontFamily: 'monospace',
               fontWeight: 'bold'
             }
           });
           coordText.anchor.set(0.5);
-          coordText.y = LOGO_SIZE / 2 + 20;
+          coordText.y = LOGO_SIZE / 2 + 28;
           logoContainer.addChild(coordText);
+          
+          const ctaText = new Text({
+            text: 'Síguenos para conseguir\ntu personaje',
+            style: { 
+              fontSize: 20, 
+              fill: 0xffffff, 
+              fontFamily: 'system-ui, sans-serif',
+              fontWeight: '500',
+              align: 'center',
+              lineHeight: 26,
+            }
+          });
+          ctaText.anchor.set(0.5);
+          ctaText.y = LOGO_SIZE / 2 + 75;
+          ctaText.alpha = 0.8;
+          logoContainer.addChild(ctaText);
+          
+          const clickArrowContainer = new Container();
+          clickArrowContainer.x = -LOGO_SIZE / 2 - 30;
+          clickArrowContainer.eventMode = 'none';
+          logoContainer.addChild(clickArrowContainer);
+          
+          const clickBg = new Graphics();
+          clickBg.roundRect(-35, -10, 40, 20, 6);
+          clickBg.fill({ color: 0xF97316 });
+          clickArrowContainer.addChild(clickBg);
+          
+          const clickText = new Text({
+            text: 'Click!',
+            style: { 
+              fontSize: 11, 
+              fill: 0xffffff, 
+              fontFamily: 'system-ui, sans-serif',
+              fontWeight: 'bold',
+            }
+          });
+          clickText.anchor.set(0.5);
+          clickText.x = -15;
+          clickArrowContainer.addChild(clickText);
+          
+          const arrowGraphics = new Graphics();
+          arrowGraphics.moveTo(10, -8);
+          arrowGraphics.lineTo(20, 0);
+          arrowGraphics.lineTo(10, 8);
+          arrowGraphics.closePath();
+          arrowGraphics.fill({ color: 0xF97316 });
+          clickArrowContainer.addChild(arrowGraphics);
+          
+          let pulseDirection = 1;
+          let pulseScale = 1;
+          pulseArrowRef.current = () => {
+            pulseScale += pulseDirection * 0.008;
+            if (pulseScale >= 1.08) pulseDirection = -1;
+            if (pulseScale <= 0.96) pulseDirection = 1;
+            clickArrowContainer.scale.set(pulseScale);
+          };
+          
+          logoContainer.on('pointerdown', () => {
+            onLogoClickRef.current();
+          });
+          
+          logoContainer.on('pointerover', () => {
+            ctaText.alpha = 1;
+          });
+          
+          logoContainer.on('pointerout', () => {
+            ctaText.alpha = 0.8;
+          });
           
           console.log('[GalleryMap] Logo loaded at 0,0');
         } catch (e) {
@@ -683,6 +760,10 @@ export function GalleryMap({ onCharacterClick, focusCharacterId }: GalleryMapPro
           
           const deltaTime = lastFrameTimeRef.current ? currentTime - lastFrameTimeRef.current : 16;
           lastFrameTimeRef.current = currentTime;
+          
+          if (pulseArrowRef.current) {
+            pulseArrowRef.current();
+          }
           
           // TODO: Remove FPS counter (testing only)
           fpsFramesRef.current++;

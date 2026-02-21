@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { GalleryMap } from '@/components/gallery/GalleryMap';
 import { CharacterModal } from '@/components/gallery/CharacterModal';
+import { LinksModal } from '@/components/gallery/LinksModal';
 import type { Seleccion } from '@/lib/character-generator';
 
 interface Character {
@@ -20,6 +21,7 @@ export default function GaleriaV2Page() {
   const [focusCharacterId, setFocusCharacterId] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<Character[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
 
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
@@ -111,11 +113,17 @@ export default function GaleriaV2Page() {
       <GalleryMap 
         onCharacterClick={setSelectedCharacter}
         focusCharacterId={focusCharacterId}
+        onLogoClick={() => setIsLinksModalOpen(true)}
       />
       
       <CharacterModal
         character={selectedCharacter}
         onClose={() => setSelectedCharacter(null)}
+      />
+      
+      <LinksModal
+        isOpen={isLinksModalOpen}
+        onClose={() => setIsLinksModalOpen(false)}
       />
     </main>
   );
