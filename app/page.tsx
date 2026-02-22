@@ -2,16 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { CharacterSVG, type Seleccion } from "@/components/CharacterSVG";
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  generatorVersion: number;
-  createdAt: string;
-}
+import Image from "next/image";
+import { CharacterSVG } from "@/components/CharacterSVG";
+import { createOrGetCharacter } from "@/app/actions/characters";
+import type { Character } from "@/lib/types/character";
 
 export default function Page() {
   const [inputId, setInputId] = useState("");
@@ -44,25 +38,18 @@ export default function Page() {
     setLoading(true);
     setError(null);
 
-    try {
-      const res = await fetch('/api/characters', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: inputId.trim() }),
-      });
+    const result = await createOrGetCharacter(inputId.trim());
 
-      if (!res.ok) throw new Error('Error al crear el personaje');
-
-      const data = await res.json();
-      setCharacter(data);
+    if (result.error) {
+      setError(result.error);
+    } else if (result.character) {
+      setCharacter(result.character as unknown as Character);
       if (totalCharacters !== null) {
         setTotalCharacters(prev => prev !== null ? prev + 1 : 1);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
@@ -76,7 +63,7 @@ export default function Page() {
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 md:px-12">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-600">
-            <img src="/logo.png" alt="Logo" className="h-6 w-6 object-contain" />
+            <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain" />
           </div>
           <span className="text-lg font-semibold tracking-tight">
             <span className="text-foreground">Character</span>

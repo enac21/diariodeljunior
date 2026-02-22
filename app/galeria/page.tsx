@@ -2,17 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CharacterSVG } from '@/components/CharacterSVG';
-import type { Seleccion } from '@/lib/character-generator';
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  generatorVersion: number;
-  createdAt: string;
-}
+import type { Character } from '@/lib/types/character';
 
 const BATCH_SIZE = 20;
 
@@ -99,7 +91,7 @@ export default function GaleriaPage() {
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 md:px-12">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-600">
-            <img src="/logo.png" alt="Logo" className="h-6 w-6 object-contain" />
+            <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain" />
           </div>
           <span className="text-lg font-semibold tracking-tight">
             <span className="text-foreground">Character</span>

@@ -5,15 +5,7 @@ import Link from 'next/link';
 import { GalleryMap } from '@/components/gallery/GalleryMap';
 import { CharacterModal } from '@/components/gallery/CharacterModal';
 import { LinksModal } from '@/components/gallery/LinksModal';
-import type { Seleccion } from '@/lib/character-generator';
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  createdAt: string;
-}
+import type { Character } from '@/lib/types/character';
 
 export default function GaleriaV2Page() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
@@ -34,14 +26,9 @@ export default function GaleriaV2Page() {
     setIsSearching(true);
     
     try {
-      const res = await fetch(`/api/characters?limit=9999`);
+      const res = await fetch(`/api/characters?search=${encodeURIComponent(query)}&limit=10`);
       const data = await res.json();
-      
-      const filtered = (data.characters || []).filter((char: Character) => 
-        char.username.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 10);
-      
-      setSearchResults(filtered);
+      setSearchResults(data.characters || []);
     } catch (e) {
       console.error('Search error:', e);
       setSearchResults([]);

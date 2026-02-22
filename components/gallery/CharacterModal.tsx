@@ -2,15 +2,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { CharacterSVG } from '@/components/CharacterSVG';
-import type { Seleccion } from '@/lib/character-generator';
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  createdAt: string;
-}
+import type { Character } from '@/lib/types/character';
 
 interface CharacterModalProps {
   character: Character | null;
