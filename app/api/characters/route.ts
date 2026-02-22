@@ -2,19 +2,30 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { stringToSeed, seleccionarPartes } from '@/lib/character-generator';
 
+const USERNAME_MIN_LENGTH = 2;
+const USERNAME_MAX_LENGTH = 24;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { username } = body;
 
-    if (!username || typeof username !== 'string' || username.trim().length === 0) {
+    if (!username || typeof username !== 'string') {
       return NextResponse.json(
         { error: 'Username is required' },
         { status: 400 }
       );
     }
 
-    const cleanUsername = username.trim();
+    const cleanUsername = username.trim().normalize('NFC').slice(0, USERNAME_MAX_LENGTH);
+
+    if (cleanUsername.length < USERNAME_MIN_LENGTH) {
+      return NextResponse.json(
+        { error: 'Username must be at least 2 characters' },
+        { status: 400 }
+      );
+    }
+
     const seed = stringToSeed(cleanUsername);
     const selectedParts = seleccionarPartes(seed);
 
