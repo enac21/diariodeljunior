@@ -1,14 +1,7 @@
+import type { Seleccion } from '@/lib/character-generator';
+
 const PARTES = ["cuerpo", "ojos", "boca", "nariz", "cabeza", "pies"] as const;
 type Parte = (typeof PARTES)[number];
-
-interface Seleccion {
-  cuerpo: number;
-  ojos: number;
-  boca: number;
-  nariz: number;
-  cabeza: number;
-  pies: number;
-}
 
 export function rutaAsset(parte: Parte, variante: number): string {
   return `/assets/${parte}/${variante}.svg`;
@@ -50,5 +43,3 @@ export function CharacterSVG({ seleccion, activeId }: { seleccion: Seleccion; ac
     </svg>
   );
 }
-
-export type { Seleccion };
