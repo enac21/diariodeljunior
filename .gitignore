@@ -16,3 +16,6 @@ generated
 # IDEs
 .idea
 .vscode
+
+#IA
+.opencode
