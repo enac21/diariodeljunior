@@ -5,6 +5,8 @@ import { Application, Container, FederatedPointerEvent, Text, Graphics, Assets, 
 import type { Seleccion } from '@/lib/character-generator';
 import { circlePosition, getRingRange, getVisibleRings } from '@/lib/circle-position';
 import { createAgent, updateAgent, type CharacterAgent } from '@/lib/character-agent';
+import { useMapStore } from '@/lib/stores/map-store';
+import { useChatStore } from '@/lib/stores/chat-store';
 
 const PARTES = ['pies', 'cuerpo', 'cabeza', 'ojos', 'nariz', 'boca'] as const;
 type Parte = typeof PARTES[number];
@@ -69,6 +71,18 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const [visibleCount, setVisibleCount] = useState(0);
   const [fps, setFps] = useState(0);
   
+  const { setWorldContainer, setCharacterPosition, removeCharacterPosition } = useMapStore();
+  
+  const setWorldContainerRef = useRef(setWorldContainer);
+  const setCharacterPositionRef = useRef(setCharacterPosition);
+  const removeCharacterPositionRef = useRef(removeCharacterPosition);
+
+  useEffect(() => {
+    setWorldContainerRef.current = setWorldContainer;
+    setCharacterPositionRef.current = setCharacterPosition;
+    removeCharacterPositionRef.current = removeCharacterPosition;
+  }, [setWorldContainer, setCharacterPosition, removeCharacterPosition]);
+  
   const charactersDataRef = useRef<Map<number, Character>>(new Map());
   const totalRef = useRef(0);
   const lastPointerRef = useRef({ x: 0, y: 0 });
@@ -91,6 +105,45 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const focusCharacterIdRef = useRef<string | null>(null);
   const onLogoClickRef = useRef(onLogoClick);
   const pulseArrowRef = useRef<(() => void) | null>(null);
+  const activeChatCharactersRef = useRef<Set<string>>(new Set());
+  const claimedCharactersRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const unsubscribe = useChatStore.subscribe((state) => {
+      const now = Date.now();
+      const active = new Set<string>();
+      state.messages.forEach((msg) => {
+        if (now - msg.timestamp < 60000) {
+          active.add(msg.characterId);
+        }
+      });
+      activeChatCharactersRef.current = active;
+      
+      const claimed = new Set<string>();
+      state.claimedCharacters.forEach((claim, characterId) => {
+        claimed.add(characterId);
+      });
+      claimedCharactersRef.current = claimed;
+    });
+
+    const state = useChatStore.getState();
+    const now = Date.now();
+    const active = new Set<string>();
+    state.messages.forEach((msg) => {
+      if (now - msg.timestamp < 60000) {
+        active.add(msg.characterId);
+      }
+    });
+    activeChatCharactersRef.current = active;
+    
+    const claimed = new Set<string>();
+    state.claimedCharacters.forEach((claim, characterId) => {
+      claimed.add(characterId);
+    });
+    claimedCharactersRef.current = claimed;
+
+    return unsubscribe;
+  }, []);
 
   useEffect(() => {
     onCharacterClickRef.current = onCharacterClick;
@@ -224,15 +277,15 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     const nameText = new Text({
       text: character.username,
       style: { 
-        fontSize: 14, 
+        fontSize: 18, 
         fill: 0xffffff, 
         fontFamily: 'system-ui, sans-serif',
-        fontWeight: '500'
+        fontWeight: 'bold'
       }
     });
-    nameText.x = -nameText.width / 2;
-    nameText.y = -CHARACTER_SIZE / 2 - 24;
-    nameText.alpha = 0.8;
+    nameText.x = -nameText.width / 2 + 10;
+    nameText.y = -CHARACTER_SIZE / 2 - 30;
+    nameText.alpha = 0.9;
     wrapper.addChild(nameText);
     
     const charContainer = new Container();
@@ -263,7 +316,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     });
     
     wrapper.on('pointerout', () => {
-      nameText.alpha = 0.8;
+      nameText.alpha = 0.9;
     });
     
     characterContainerCache.set(cacheKey, wrapper);
@@ -318,6 +371,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     for (const index of toRemove) {
       const character = charactersDataRef.current.get(index);
       if (character) {
+        removeCharacterPositionRef.current(character.id);
         const child = charactersContainer.children.find(c => c.label === `character-${character.id}`);
         if (child) {
           let alpha = 1;
@@ -521,7 +575,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
           logoContainer.addChild(logoSprite);
           
           const coordText = new Text({
-            text: '0, 0',
+            text: '0,0',
             style: { 
               fontSize: 35, 
               fill: 0xF97316, 
@@ -764,6 +818,12 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
           if (pulseArrowRef.current) {
             pulseArrowRef.current();
           }
+
+          setWorldContainerRef.current({
+            x: worldContainer.x,
+            y: worldContainer.y,
+            scale: worldContainer.scale.x,
+          });
           
           // TODO: Remove FPS counter (testing only)
           fpsFramesRef.current++;
@@ -783,9 +843,13 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             const agent = agentsRef.current.get(index);
             if (!agent) return;
             
-            updateAgent(agent, deltaTime, visibleAgents);
-            
             const character = charactersDataRef.current.get(index);
+            const isChatting = character 
+              ? activeChatCharactersRef.current.has(character.id) || claimedCharactersRef.current.has(character.id)
+              : false;
+            
+            updateAgent(agent, deltaTime, visibleAgents, isChatting);
+            
             if (character) {
               const container = charactersContainer.children.find(
                 c => c.label === `character-${character.id}`
@@ -793,6 +857,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
               if (container) {
                 container.x = agent.x;
                 container.y = agent.y;
+                setCharacterPositionRef.current(character.id, { x: agent.x, y: agent.y });
               }
             }
           });

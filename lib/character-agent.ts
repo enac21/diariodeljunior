@@ -91,8 +91,18 @@ function getHomeForce(agent: CharacterAgent): Vector2 {
 export function updateAgent(
   agent: CharacterAgent,
   deltaTime: number,
-  visibleAgents: CharacterAgent[]
+  visibleAgents: CharacterAgent[],
+  isChatting: boolean = false
 ): void {
+  if (isChatting) {
+    agent.vx *= 0.9;
+    agent.vy *= 0.9;
+    agent.x += agent.vx * deltaTime * 0.001;
+    agent.y += agent.vy * deltaTime * 0.001;
+    return;
+  }
+
+  agent.stateTimer += deltaTime;
   agent.stateTimer += deltaTime;
   
   if (agent.stateTimer >= agent.nextStateChange) {
