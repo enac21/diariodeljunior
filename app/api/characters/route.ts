@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { stringToSeed, seleccionarPartes } from '@/lib/character-generator';
+import { rateLimit, extractIp } from '@/lib/rate-limit';
 
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 24;
@@ -17,6 +18,14 @@ function parsePagination(limit: string | null, offset: string | null) {
 }
 
 export async function POST(request: NextRequest) {
+  const { success, resetIn } = rateLimit(extractIp(request));
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: Math.ceil(resetIn / 1000) },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(resetIn / 1000)) } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { username } = body;
