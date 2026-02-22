@@ -6,6 +6,7 @@ import type { Character } from '@/lib/types/character';
 import { circlePosition, getRingRange, getVisibleRings } from '@/lib/circle-position';
 import { createAgent, updateAgent, type CharacterAgent } from '@/lib/character-agent';
 import { useMapStore } from '@/lib/stores/map-store';
+import { useCharactersData } from '@/lib/hooks/useCharactersData';
 
 const PARTES = ['pies', 'cuerpo', 'cabeza', 'ojos', 'nariz', 'boca'] as const;
 type Parte = typeof PARTES[number];
@@ -64,6 +65,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const [fps, setFps] = useState(0);
   
   const { setWorldContainer, setCharacterPosition, removeCharacterPosition } = useMapStore();
+  const { charactersDataRef, totalRef, fetchTotal, ensureLoaded, get: getCharacter, clear: clearCharactersData } = useCharactersData();
   
   const setWorldContainerRef = useRef(setWorldContainer);
   const setCharacterPositionRef = useRef(setCharacterPosition);
@@ -75,13 +77,9 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     removeCharacterPositionRef.current = removeCharacterPosition;
   }, [setWorldContainer, setCharacterPosition, removeCharacterPosition]);
   
-  const charactersDataRef = useRef<Map<number, Character>>(new Map());
-  const totalRef = useRef(0);
   const lastPointerRef = useRef({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
   const renderedIndicesRef = useRef<Set<number>>(new Set());
-  const loadingBatchRef = useRef(false);
-  const loadedRangesRef = useRef<Array<{ start: number; end: number }>>([]);
   const onCharacterClickRef = useRef(onCharacterClick);
   const lastTouchDistanceRef = useRef(0);
   const lastTouchCenterRef = useRef({ x: 0, y: 0 });
@@ -136,67 +134,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     worldContainer.scale.set(1);
     setZoom(100);
   }, [focusCharacterId]);
-
-  const fetchCharactersRange = useCallback(async (startIndex: number, count: number): Promise<{ characters: Character[]; total: number }> => {
-    const offset = Math.max(0, startIndex);
-    const res = await fetch(`/api/characters/map?offset=${offset}&limit=${count}`);
-    
-    if (!res.ok) {
-      throw new Error(`API error: ${res.status}`);
-    }
-    
-    const data = await res.json();
-    return {
-      characters: data.characters || [],
-      total: data.total || 0
-    };
-  }, []);
-
-  const ensureCharactersLoaded = useCallback(async (neededIndices: number[]): Promise<void> => {
-    if (neededIndices.length === 0) return;
-    
-    const totalChars = totalRef.current;
-    const validIndices = neededIndices.filter(i => i >= 0 && (totalChars === 0 || i < totalChars));
-    
-    if (validIndices.length === 0) return;
-    
-    const unloadedIndices = validIndices.filter(i => !charactersDataRef.current.has(i));
-    if (unloadedIndices.length === 0) return;
-    
-    const unloadedMin = Math.min(...unloadedIndices);
-    const unloadedMax = Math.max(...unloadedIndices);
-    
-    const alreadyInRange = loadedRangesRef.current.some(
-      range => unloadedMin >= range.start && unloadedMax <= range.end
-    );
-    
-    if (alreadyInRange) return;
-    
-    if (loadingBatchRef.current) return;
-    loadingBatchRef.current = true;
-    
-    try {
-      const batchStart = Math.floor(unloadedMin / BATCH_SIZE) * BATCH_SIZE;
-      
-      const { characters, total: fetchedTotal } = await fetchCharactersRange(batchStart, BATCH_SIZE);
-      
-      if (fetchedTotal > 0 && totalRef.current === 0) {
-        totalRef.current = fetchedTotal;
-        setTotal(fetchedTotal);
-      }
-      
-      characters.forEach((char, i) => {
-        charactersDataRef.current.set(batchStart + i, char);
-      });
-      
-      loadedRangesRef.current.push({ start: batchStart, end: batchStart + characters.length - 1 });
-      console.log(`[GalleryMap] Loaded batch: ${batchStart} - ${batchStart + characters.length - 1}, total: ${fetchedTotal}`);
-    } catch (e) {
-      console.error('[GalleryMap] Error fetching characters:', e);
-    } finally {
-      loadingBatchRef.current = false;
-    }
-  }, [fetchCharactersRange]);
 
   const createCharacterContainer = useCallback(async (character: Character, index: number): Promise<Container> => {
     const cacheKey = character.id;
@@ -311,7 +248,10 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     }
     
     if (neededIndices.length > 0) {
-      await ensureCharactersLoaded(neededIndices);
+      const newTotal = await ensureLoaded(neededIndices);
+      if (newTotal !== total) {
+        setTotal(newTotal);
+      }
     }
     
     const halfViewWidth = (screenWidth / scale) / 2;
@@ -444,7 +384,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
       if (inViewport) finalVisibleCount++;
     });
     setVisibleCount(finalVisibleCount);
-  }, [ensureCharactersLoaded, createCharacterContainer]);
+  }, [ensureLoaded, createCharacterContainer]);
 
   const handleZoom = useCallback((zoomIn: boolean, centerX?: number, centerY?: number) => {
     const worldContainer = worldContainerRefForZoom.current;
@@ -483,20 +423,15 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
       console.log('[GalleryMap] Starting initialization...');
       
       try {
-        const res = await fetch('/api/characters/count');
-        if (res.ok) {
-          const { total: fetchedTotal } = await res.json();
-          console.log(`[GalleryMap] Fetched initial total: ${fetchedTotal}`);
-          
-          if (!mounted) return;
-          
-          totalRef.current = fetchedTotal;
-          setTotal(fetchedTotal);
-        }
+        const fetchedTotal = await fetchTotal();
+        console.log(`[GalleryMap] Fetched initial total: ${fetchedTotal}`);
+        
+        if (!mounted) return;
+        
+        setTotal(fetchedTotal);
       } catch (e) {
         console.error('[GalleryMap] Error fetching initial total:', e);
         if (!mounted) return;
-        totalRef.current = 0;
         setTotal(0);
       }
       
@@ -858,11 +793,9 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
       characterContainerCache.clear();
       agentsRef.current.clear();
       renderedIndicesRef.current.clear();
-      charactersDataRef.current.clear();
-      loadedRangesRef.current = [];
-      totalRef.current = 0;
+      clearCharactersData();
     };
-  }, [fetchCharactersRange, updateVisibleCharacters]);
+  }, [updateVisibleCharacters, clearCharactersData]);
 
   return (
     <div ref={containerRef} className="relative h-full w-full bg-background">
