@@ -234,8 +234,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
       ? Math.min(maxRing, Math.ceil(totalChars / 8) + 2)
       : maxRing;
     
-    console.log(`[GalleryMap] Updating visible: minRing=${minRing}, maxRing=${maxRing}, effectiveMaxRing=${effectiveMaxRing}, total=${totalChars}`);
-    
     for (let ring = Math.max(1, minRing); ring <= effectiveMaxRing; ring++) {
       const range = getRingRange(ring);
       const maxPossibleIndex = totalChars > 0 ? Math.min(range.endIndex, totalChars - 1) : range.endIndex;
@@ -327,13 +325,9 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     );
     
     if (toAdd.length > 0) {
-      const renderStartTime = performance.now();
-      
       for (const index of toAdd) {
         const character = charactersDataRef.current.get(index);
         if (!character) continue;
-        
-        const charStartTime = performance.now();
         
         try {
           const container = await createCharacterContainer(character, index);
@@ -361,16 +355,10 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             }
           };
           requestAnimationFrame(fadeIn);
-          
-          const charEndTime = performance.now();
-          console.log(`[TODO: Remove] Character "${character.username}" (ring ${circlePosition(index, INITIAL_RADIUS).ring}, pos ${index}) rendered in ${(charEndTime - charStartTime).toFixed(2)}ms`);
-        } catch (e) {
+         } catch (e) {
           console.error(`[GalleryMap] Error creating character:`, e);
         }
       }
-      
-      const renderEndTime = performance.now();
-      console.log(`[TODO: Remove] Batch of ${toAdd.length} characters rendered in ${(renderEndTime - renderStartTime).toFixed(2)}ms`);
     }
     
     let finalVisibleCount = 0;
@@ -415,22 +403,17 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     const init = async () => {
       const container = containerRef.current;
       if (!container) {
-        console.error('[GalleryMap] No container ref - retrying...');
         requestAnimationFrame(init);
         return;
       }
       
-      console.log('[GalleryMap] Starting initialization...');
-      
       try {
         const fetchedTotal = await fetchTotal();
-        console.log(`[GalleryMap] Fetched initial total: ${fetchedTotal}`);
         
         if (!mounted) return;
         
         setTotal(fetchedTotal);
       } catch (e) {
-        console.error('[GalleryMap] Error fetching initial total:', e);
         if (!mounted) return;
         setTotal(0);
       }
@@ -455,7 +438,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
         
         container!.appendChild(app.canvas);
         appRef.current = app;
-        console.log('[GalleryMap] PixiJS initialized');
         
         const worldContainer = new Container();
         worldContainer.sortableChildren = true;
@@ -557,8 +539,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
           logoContainer.on('pointerout', () => {
             ctaText.alpha = 0.8;
           });
-          
-          console.log('[GalleryMap] Logo loaded at 0,0');
         } catch (e) {
           console.error('[GalleryMap] Error loading logo:', e);
         }
@@ -577,7 +557,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
         worldContainer.x = viewWidth / 2;
         worldContainer.y = viewHeight / 2;
         
-        console.log('[GalleryMap] Setting loading to false');
         setLoading(false);
         
         await updateVisibleCharacters(charactersContainer, worldContainer, viewWidth, viewHeight);
@@ -728,7 +707,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             scale: worldContainer.scale.x,
           });
           
-          // TODO: Remove FPS counter (testing only)
           fpsFramesRef.current++;
           if (currentTime - fpsLastTimeRef.current >= 1000) {
             setFps(fpsFramesRef.current);
@@ -780,7 +758,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     init();
     
     return () => {
-      console.log('[GalleryMap] Cleanup');
       mounted = false;
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
