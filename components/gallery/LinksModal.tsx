@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
+import Image from 'next/image';
 
 interface LinksModalProps {
   isOpen: boolean;
@@ -74,7 +75,7 @@ export function LinksModal({ isOpen, onClose }: LinksModalProps) {
       onClick={onClose}
     >
       <div
-        className="relative mx-4 w-full max-w-sm rounded-2xl border border-border/50 bg-card/95 p-6 backdrop-blur-xl"
+        className="relative mx-4 w-full max-w-sm rounded-2xl border border-border/50 bg-card/95 p-8 backdrop-blur-xl"
         onClick={e => e.stopPropagation()}
       >
         <button
@@ -86,24 +87,36 @@ export function LinksModal({ isOpen, onClose }: LinksModalProps) {
           </svg>
         </button>
 
-        <h2 className="mb-1 text-xl font-bold text-foreground text-center">
-          Síguenos
-        </h2>
-        <p className="mb-6 text-sm text-muted-foreground text-center">
-          Consigue tu personaje único
-        </p>
+        <div className="flex flex-col items-center mb-6">
+          <div className="mb-4 h-24 w-24 relative">
+            <Image
+              src="/logo.png"
+              alt="Character Forge Logo"
+              fill
+              className="object-contain"
+            />
+          </div>
+          
+          <h2 className="mb-2 text-xl font-bold text-foreground">
+            @diariodeljunior
+          </h2>
+          
+          <p className="text-sm text-muted-foreground text-center">
+            Explora el mundo de la programación conmigo 🌎
+          </p>
+        </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="flex flex-col gap-3">
           {socialLinks.map((link) => (
             <a
               key={link.name}
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-white transition-all ${link.color}`}
+              className={`flex items-center justify-center gap-3 rounded-xl px-4 py-3.5 text-white transition-all hover:scale-[1.02] active:scale-[0.98] ${link.color}`}
             >
               {link.icon}
-              <span className="font-medium">{link.name}</span>
+              <span className="font-semibold">{link.name}</span>
             </a>
           ))}
         </div>
