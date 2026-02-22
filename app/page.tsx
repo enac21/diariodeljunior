@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { CharacterSVG, type Seleccion } from "@/components/CharacterSVG";
+import { createOrGetCharacter } from "@/app/actions/characters";
 
 interface Character {
   id: string;
@@ -44,25 +45,18 @@ export default function Page() {
     setLoading(true);
     setError(null);
 
-    try {
-      const res = await fetch('/api/characters', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: inputId.trim() }),
-      });
+    const result = await createOrGetCharacter(inputId.trim());
 
-      if (!res.ok) throw new Error('Error al crear el personaje');
-
-      const data = await res.json();
-      setCharacter(data);
+    if (result.error) {
+      setError(result.error);
+    } else if (result.character) {
+      setCharacter(result.character as unknown as Character);
       if (totalCharacters !== null) {
         setTotalCharacters(prev => prev !== null ? prev + 1 : 1);
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   return (
