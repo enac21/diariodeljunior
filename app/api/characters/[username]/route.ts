@@ -5,7 +5,7 @@ import { handleApiError } from '@/lib/api-utils';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   const { success, resetIn } = rateLimit(extractIp(request), RATE_LIMIT_PRESETS.GET);
   if (!success) {
@@ -16,7 +16,7 @@ export async function GET(
   }
 
   try {
-    const { username } = params;
+    const { username } = await params;
 
     if (!username) {
       return NextResponse.json(
