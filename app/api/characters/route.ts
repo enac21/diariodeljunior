@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { stringToSeed, seleccionarPartes } from '@/lib/character-generator';
-import { rateLimit, extractIp } from '@/lib/rate-limit';
+import { rateLimit, extractIp, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 24;
@@ -18,7 +18,7 @@ function parsePagination(limit: string | null, offset: string | null) {
 }
 
 export async function POST(request: NextRequest) {
-  const { success, resetIn } = rateLimit(extractIp(request));
+  const { success, resetIn } = rateLimit(extractIp(request), RATE_LIMIT_PRESETS.POST);
   if (!success) {
     return NextResponse.json(
       { error: 'Too many requests', retryAfter: Math.ceil(resetIn / 1000) },
@@ -71,6 +71,14 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  const { success, resetIn } = rateLimit(extractIp(request), RATE_LIMIT_PRESETS.GET);
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: Math.ceil(resetIn / 1000) },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(resetIn / 1000)) } }
+    );
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const { limit, offset } = parsePagination(
@@ -86,12 +94,10 @@ export async function GET(request: NextRequest) {
 
     const total = await prisma.character.count();
 
-    return NextResponse.json({
-      characters,
-      total,
-      limit,
-      offset,
-    });
+    return NextResponse.json(
+      { characters, total, limit, offset },
+      { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=60' } }
+    );
   } catch (error) {
     console.error('Error fetching characters:', error);
     return NextResponse.json(

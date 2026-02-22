@@ -1,10 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { rateLimit, extractIp, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { username: string } }
 ) {
+  const { success, resetIn } = rateLimit(extractIp(request), RATE_LIMIT_PRESETS.GET);
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests', retryAfter: Math.ceil(resetIn / 1000) },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil(resetIn / 1000)) } }
+    );
+  }
+
   try {
     const { username } = params;
 
@@ -26,7 +35,9 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(character);
+    return NextResponse.json(character, {
+      headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' },
+    });
   } catch (error) {
     console.error('Error fetching character:', error);
     return NextResponse.json(
