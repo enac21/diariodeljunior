@@ -39,16 +39,16 @@ export function createAgent(index: number, homeX: number, homeY: number): Charac
     index,
     homeX,
     homeY,
-    x: homeX + (Math.random() - 0.5) * 150,
-    y: homeY + (Math.random() - 0.5) * 150,
+    x: homeX + (Math.random() - 0.5) * 100,
+    y: homeY + (Math.random() - 0.5) * 100,
     vx: 0,
     vy: 0,
     state: initialState,
     stateTimer: 0,
     nextStateChange: getRandomStateDuration(initialState),
     maxSpeed,
-    wanderStrength: 0.2 + Math.random() * 0.3,
-    maxDistance: 350 + Math.random() * 150,
+    wanderStrength: 0.15 + Math.random() * 0.2,
+    maxDistance: 100 + Math.random() * 100,
   };
 }
 
@@ -74,25 +74,34 @@ function getHomeForce(agent: CharacterAgent): Vector2 {
   const dy = agent.homeY - agent.y;
   const distance = Math.sqrt(dx * dx + dy * dy);
   
-  if (distance < agent.maxDistance * 0.3) {
+  if (distance < agent.maxDistance * 0.2) {
     return { x: 0, y: 0 };
   }
   
-  const strength = Math.pow((distance - agent.maxDistance * 0.3) / agent.maxDistance, 2);
+  const strength = Math.pow((distance - agent.maxDistance * 0.2) / agent.maxDistance, 1.5);
   
   if (distance === 0) return { x: 0, y: 0 };
   
   return {
-    x: (dx / distance) * strength * 3,
-    y: (dy / distance) * strength * 3,
+    x: (dx / distance) * strength * 5,
+    y: (dy / distance) * strength * 5,
   };
 }
 
 export function updateAgent(
   agent: CharacterAgent,
   deltaTime: number,
-  visibleAgents: CharacterAgent[]
+  visibleAgents: CharacterAgent[],
+  isChatting: boolean = false
 ): void {
+  if (isChatting) {
+    agent.vx *= 0.9;
+    agent.vy *= 0.9;
+    agent.x += agent.vx * deltaTime * 0.001;
+    agent.y += agent.vy * deltaTime * 0.001;
+    return;
+  }
+
   agent.stateTimer += deltaTime;
   
   if (agent.stateTimer >= agent.nextStateChange) {
