@@ -4,6 +4,17 @@ import { stringToSeed, seleccionarPartes } from '@/lib/character-generator';
 
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 24;
+const PAGINATION_DEFAULT_LIMIT = 50;
+const PAGINATION_MAX_LIMIT = 100;
+
+function parsePagination(limit: string | null, offset: string | null) {
+  const parsedLimit = parseInt(limit || '') || PAGINATION_DEFAULT_LIMIT;
+  const parsedOffset = Math.max(parseInt(offset || '') || 0, 0);
+  return {
+    limit: Math.min(Math.max(parsedLimit, 1), PAGINATION_MAX_LIMIT),
+    offset: parsedOffset,
+  };
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,8 +64,10 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    const { limit, offset } = parsePagination(
+      searchParams.get('limit'),
+      searchParams.get('offset')
+    );
 
     const characters = await prisma.character.findMany({
       orderBy: { createdAt: 'desc' },
