@@ -15,24 +15,19 @@ export async function POST(request: NextRequest) {
     }
 
     const cleanUsername = username.trim();
-    
-    let character = await prisma.character.findUnique({
+    const seed = stringToSeed(cleanUsername);
+    const selectedParts = seleccionarPartes(seed);
+
+    const character = await prisma.character.upsert({
       where: { username: cleanUsername },
+      update: {},
+      create: {
+        username: cleanUsername,
+        seed,
+        selectedParts: selectedParts as any,
+        generatorVersion: 1,
+      },
     });
-
-    if (!character) {
-      const seed = stringToSeed(cleanUsername);
-      const selectedParts = seleccionarPartes(seed);
-
-      character = await prisma.character.create({
-        data: {
-          username: cleanUsername,
-          seed,
-          selectedParts: selectedParts as any,
-          generatorVersion: 1,
-        },
-      });
-    }
 
     return NextResponse.json(character);
   } catch (error) {
