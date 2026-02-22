@@ -6,7 +6,6 @@ import type { Seleccion } from '@/lib/character-generator';
 import { circlePosition, getRingRange, getVisibleRings } from '@/lib/circle-position';
 import { createAgent, updateAgent, type CharacterAgent } from '@/lib/character-agent';
 import { useMapStore } from '@/lib/stores/map-store';
-import { useChatStore } from '@/lib/stores/chat-store';
 
 const PARTES = ['pies', 'cuerpo', 'cabeza', 'ojos', 'nariz', 'boca'] as const;
 type Parte = typeof PARTES[number];
@@ -106,45 +105,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const focusCharacterIdRef = useRef<string | null>(null);
   const onLogoClickRef = useRef(onLogoClick);
   const pulseArrowRef = useRef<(() => void) | null>(null);
-  const activeChatCharactersRef = useRef<Set<string>>(new Set());
-  const claimedCharactersRef = useRef<Set<string>>(new Set());
-
-  useEffect(() => {
-    const unsubscribe = useChatStore.subscribe((state) => {
-      const now = Date.now();
-      const active = new Set<string>();
-      state.messages.forEach((msg) => {
-        if (now - msg.timestamp < 60000) {
-          active.add(msg.characterId);
-        }
-      });
-      activeChatCharactersRef.current = active;
-      
-      const claimed = new Set<string>();
-      state.claimedCharacters.forEach((claim, characterId) => {
-        claimed.add(characterId);
-      });
-      claimedCharactersRef.current = claimed;
-    });
-
-    const state = useChatStore.getState();
-    const now = Date.now();
-    const active = new Set<string>();
-    state.messages.forEach((msg) => {
-      if (now - msg.timestamp < 60000) {
-        active.add(msg.characterId);
-      }
-    });
-    activeChatCharactersRef.current = active;
-    
-    const claimed = new Set<string>();
-    state.claimedCharacters.forEach((claim, characterId) => {
-      claimed.add(characterId);
-    });
-    claimedCharactersRef.current = claimed;
-
-    return unsubscribe;
-  }, []);
 
   useEffect(() => {
     onCharacterClickRef.current = onCharacterClick;
@@ -860,9 +820,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             if (!agent) return;
             
             const character = charactersDataRef.current.get(index);
-            const isChatting = character 
-              ? activeChatCharactersRef.current.has(character.id) || claimedCharactersRef.current.has(character.id)
-              : false;
+            const isChatting = false;
             
             updateAgent(agent, deltaTime, visibleAgents, isChatting);
             
