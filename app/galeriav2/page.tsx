@@ -5,15 +5,7 @@ import Link from 'next/link';
 import { GalleryMap } from '@/components/gallery/GalleryMap';
 import { CharacterModal } from '@/components/gallery/CharacterModal';
 import { LinksModal } from '@/components/gallery/LinksModal';
-import type { Seleccion } from '@/lib/character-generator';
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  createdAt: string;
-}
+import type { Character } from '@/lib/types/character';
 
 export default function GaleriaV2Page() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);

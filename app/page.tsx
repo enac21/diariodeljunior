@@ -2,17 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { CharacterSVG, type Seleccion } from "@/components/CharacterSVG";
+import { CharacterSVG } from "@/components/CharacterSVG";
 import { createOrGetCharacter } from "@/app/actions/characters";
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  generatorVersion: number;
-  createdAt: string;
-}
+import type { Character } from "@/lib/types/character";
 
 export default function Page() {
   const [inputId, setInputId] = useState("");

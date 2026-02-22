@@ -2,21 +2,13 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Application, Container, FederatedPointerEvent, Text, Graphics, Assets, Sprite, Texture } from 'pixi.js';
-import type { Seleccion } from '@/lib/character-generator';
+import type { Character } from '@/lib/types/character';
 import { circlePosition, getRingRange, getVisibleRings } from '@/lib/circle-position';
 import { createAgent, updateAgent, type CharacterAgent } from '@/lib/character-agent';
 import { useMapStore } from '@/lib/stores/map-store';
 
 const PARTES = ['pies', 'cuerpo', 'cabeza', 'ojos', 'nariz', 'boca'] as const;
 type Parte = typeof PARTES[number];
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  createdAt: string;
-}
 
 interface GalleryMapProps {
   onCharacterClick: (character: Character) => void;

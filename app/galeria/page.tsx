@@ -3,16 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { CharacterSVG } from '@/components/CharacterSVG';
-import type { Seleccion } from '@/lib/character-generator';
-
-interface Character {
-  id: string;
-  username: string;
-  seed: number;
-  selectedParts: Seleccion;
-  generatorVersion: number;
-  createdAt: string;
-}
+import type { Character } from '@/lib/types/character';
 
 const BATCH_SIZE = 20;
 
