@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { rateLimit, extractIp, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
+import { handleApiError } from '@/lib/api-utils';
 
 export async function GET(
   request: NextRequest,
@@ -39,10 +40,6 @@ export async function GET(
       headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' },
     });
   } catch (error) {
-    console.error('Error fetching character:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'GET /api/characters/[username]');
   }
 }

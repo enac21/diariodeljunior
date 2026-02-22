@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { stringToSeed, seleccionarPartes } from '@/lib/character-generator';
 import { rateLimit, extractIp, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
+import { handleApiError } from '@/lib/api-utils';
 
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 24;
@@ -62,11 +63,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(character);
   } catch (error) {
-    console.error('Error creating/fetching character:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'POST /api/characters');
   }
 }
 
@@ -100,10 +97,6 @@ export async function GET(request: NextRequest) {
       { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=60' } }
     );
   } catch (error) {
-    console.error('Error fetching characters:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'GET /api/characters');
   }
 }

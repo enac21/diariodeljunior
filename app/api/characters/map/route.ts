@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { rateLimit, extractIp, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
+import { handleApiError } from '@/lib/api-utils';
 
 export async function GET(request: NextRequest) {
   const { success, resetIn } = rateLimit(extractIp(request), RATE_LIMIT_PRESETS.GET);
@@ -45,10 +46,6 @@ export async function GET(request: NextRequest) {
       { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=60' } }
     );
   } catch (error) {
-    console.error('Error fetching map characters:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'GET /api/characters/map');
   }
 }
