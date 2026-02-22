@@ -86,13 +86,14 @@ export async function GET(request: NextRequest) {
       searchParams.get('offset')
     );
 
-    const characters = await prisma.character.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: limit,
-      skip: offset,
-    });
-
-    const total = await prisma.character.count();
+    const [characters, total] = await Promise.all([
+      prisma.character.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.character.count(),
+    ]);
 
     return NextResponse.json(
       { characters, total, limit, offset },

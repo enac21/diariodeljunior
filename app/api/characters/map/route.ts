@@ -16,20 +16,21 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get('limit') || '100'), 500);
     const offset = Math.max(0, parseInt(searchParams.get('offset') || '0'));
 
-    const characters = await prisma.character.findMany({
-      orderBy: { createdAt: 'asc' },
-      select: {
-        id: true,
-        username: true,
-        seed: true,
-        selectedParts: true,
-        createdAt: true,
-      },
-      take: limit,
-      skip: offset,
-    });
-
-    const total = await prisma.character.count();
+    const [characters, total] = await Promise.all([
+      prisma.character.findMany({
+        orderBy: { createdAt: 'asc' },
+        select: {
+          id: true,
+          username: true,
+          seed: true,
+          selectedParts: true,
+          createdAt: true,
+        },
+        take: limit,
+        skip: offset,
+      }),
+      prisma.character.count(),
+    ]);
 
     return NextResponse.json(
       {
