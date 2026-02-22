@@ -34,14 +34,9 @@ export default function GaleriaV2Page() {
     setIsSearching(true);
     
     try {
-      const res = await fetch(`/api/characters?limit=9999`);
+      const res = await fetch(`/api/characters?search=${encodeURIComponent(query)}&limit=10`);
       const data = await res.json();
-      
-      const filtered = (data.characters || []).filter((char: Character) => 
-        char.username.toLowerCase().includes(query.toLowerCase())
-      ).slice(0, 10);
-      
-      setSearchResults(filtered);
+      setSearchResults(data.characters || []);
     } catch (e) {
       console.error('Search error:', e);
       setSearchResults([]);
