@@ -93,6 +93,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const fpsFramesRef = useRef(0);
   const fpsLastTimeRef = useRef(0);
   const focusCharacterIdRef = useRef<string | null>(null);
+  const followedIndexRef = useRef<number | null>(null);
   const onLogoClickRef = useRef(onLogoClick);
   const pulseArrowRef = useRef<(() => void) | null>(null);
 
@@ -107,7 +108,10 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   useEffect(() => {
     focusCharacterIdRef.current = focusCharacterId;
     
-    if (!focusCharacterId || !worldContainerRef.current || !appRef.current) return;
+    if (!focusCharacterId || !worldContainerRef.current || !appRef.current) {
+      followedIndexRef.current = null;
+      return;
+    }
     
     const worldContainer = worldContainerRef.current;
     const app = appRef.current;
@@ -119,7 +123,12 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
       }
     });
     
-    if (foundIndex === -1) return;
+    if (foundIndex === -1) {
+      followedIndexRef.current = null;
+      return;
+    }
+
+    followedIndexRef.current = foundIndex;
     
     const agent = agentsRef.current.get(foundIndex);
     if (!agent) {
@@ -569,6 +578,8 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
         app.stage.on('pointermove', (e: FederatedPointerEvent) => {
           if (!isDraggingRef.current) return;
           
+          followedIndexRef.current = null;
+          
           const dx = e.global.x - lastPointerRef.current.x;
           const dy = e.global.y - lastPointerRef.current.y;
           
@@ -740,6 +751,14 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
               }
             }
           });
+
+          if (followedIndexRef.current !== null && worldContainer && app) {
+            const followedAgent = agentsRef.current.get(followedIndexRef.current);
+            if (followedAgent) {
+              worldContainer.x = app.screen.width / 2 - followedAgent.x;
+              worldContainer.y = app.screen.height / 2 - followedAgent.y;
+            }
+          }
           
           animationFrameRef.current = requestAnimationFrame(animationLoop);
         };
