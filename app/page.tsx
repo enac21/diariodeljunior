@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CharacterSVG } from "@/components/CharacterSVG";
 import { createOrGetCharacter } from "@/app/actions/characters";
+import { Footer } from "@/components/Footer";
 import type { Character } from "@/lib/types/character";
 
 export default function Page() {
@@ -266,14 +267,7 @@ export default function Page() {
         </div>
       </div>
 
-      <footer className="relative z-10 mt-20 border-t border-border/50 py-6">
-        <div className="mx-auto max-w-6xl px-6 md:px-12">
-          <div className="flex flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-            <p>Character Forge — Generador de personajes procedimental</p>
-            <p className="font-mono text-xs">v1.0.0</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }
