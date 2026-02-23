@@ -42,7 +42,7 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">4. Intellectual Property</h2>
-            <p>The characters displayed on Diario del Junior are created through a proprietary procedural algorithm. The Service, its content, features, and functionality are owned by Diario del Junior and are protected by international copyright, trademark, and other intellectual property laws.</p>
+            <p>The characters displayed on Diario del Junior are created through a procedural generation system developed for the Service. The Service, its content, features, and functionality are owned by Diario del Junior and are protected by international copyright, trademark, and other intellectual property laws.</p>
           </section>
 
           <section>
