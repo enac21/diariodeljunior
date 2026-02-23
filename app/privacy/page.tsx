@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Privacy Policy - Character Forge',
+  title: 'Privacy Policy - Diario del Junior',
 };
 
 export default function PrivacyPage() {
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
         <div className="prose prose-invert max-w-none space-y-6 text-muted-foreground">
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">1. Information We Collect</h2>
-            <p>Character Forge collects minimal information necessary to provide our service:</p>
+            <p>Diario del Junior collects minimal information necessary to provide our service:</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
               <li><strong>Character Data:</strong> Usernames/identifiers used to generate characters are stored in our database.</li>
               <li><strong>Usage Data:</strong> We may collect anonymous usage statistics to improve our service.</li>
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">4. Cookies</h2>
-            <p>Character Forge may use essential cookies to ensure proper functionality of the service. We do not use tracking cookies or third-party analytics without your consent.</p>
+            <p>Diario del Junior may use essential cookies to ensure proper functionality of the service. We do not use tracking cookies or third-party analytics without your consent.</p>
           </section>
 
           <section>

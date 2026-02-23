@@ -91,7 +91,7 @@ export function LinksModal({ isOpen, onClose }: LinksModalProps) {
           <div className="mb-4 h-24 w-24 relative">
             <Image
               src="/logo.png"
-              alt="Character Forge Logo"
+              alt="Diario del Junior Logo"
               fill
               className="object-contain"
             />

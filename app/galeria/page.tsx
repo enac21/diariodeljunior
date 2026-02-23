@@ -95,8 +95,8 @@ export default function GaleriaPage() {
             <Image src="/logo.png" alt="Logo" width={24} height={24} className="object-contain" />
           </div>
           <span className="text-lg font-semibold tracking-tight">
-            <span className="text-foreground">Character</span>
-            <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">Forge</span>
+            <span className="text-foreground">Diario del</span>
+            <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-orange-600 bg-clip-text text-transparent"> Junior</span>
           </span>
         </Link>
         

@@ -3,12 +3,18 @@
 import prisma from '@/lib/prisma';
 import { stringToSeed, seleccionarPartes } from '@/lib/character-generator';
 import { handleApiError } from '@/lib/api-utils';
+import { verifyAuthToken } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 
 const USERNAME_MIN_LENGTH = 2;
 const USERNAME_MAX_LENGTH = 24;
 
 export async function createOrGetCharacter(username: string) {
+  const auth = await verifyAuthToken();
+  if (!auth.valid) {
+    return { error: auth.error };
+  }
+
   if (!username || typeof username !== 'string') {
     return { error: 'Username is required' };
   }

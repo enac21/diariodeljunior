@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Character Forge - Generador de Personajes Procedimental',
-  description: 'Genera personajes SVG únicos a partir de cualquier ID usando aleatoriedad con semilla. Explora el mapa de personajes.',
-  keywords: ['procedural', 'character generator', 'SVG', 'random', 'seed'],
+  title: 'Diario del Junior - Explora el Mapa de Personajes',
+  description: 'Descubre personajes únicos generados proceduralmente. Explora el mapa interactivo y sígueme en mis redes sociales.',
+  keywords: ['procedural', 'character generator', 'SVG', 'random', 'seed', 'map'],
 }
 
 export const viewport: Viewport = {
