@@ -23,7 +23,6 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-foreground mb-3">1. Information We Collect</h2>
             <p>Diario del Junior collects minimal information necessary to provide our service:</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li><strong>Character Data:</strong> Usernames/identifiers used to generate characters are stored in our database.</li>
               <li><strong>Usage Data:</strong> We may collect anonymous usage statistics to improve our service.</li>
               <li><strong>Technical Data:</strong> IP addresses and browser information may be logged for security purposes.</li>
             </ul>
@@ -33,8 +32,7 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-semibold text-foreground mb-3">2. How We Use Your Information</h2>
             <p>We use the collected information to:</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Generate and display procedural characters</li>
-              <li>Maintain the character gallery</li>
+              <li>Display and maintain the character map and gallery</li>
               <li>Improve and optimize our service</li>
               <li>Protect against abuse and ensure security</li>
             </ul>
@@ -42,7 +40,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">3. Data Storage</h2>
-            <p>Generated characters and their associated identifiers are stored securely in our database. We implement appropriate security measures to protect your data from unauthorized access or disclosure.</p>
+            <p>Character data is generated and stored securely in our database. We implement appropriate security measures to protect data from unauthorized access or disclosure.</p>
           </section>
 
           <section>
@@ -57,15 +55,15 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">6. Data Retention</h2>
-            <p>Characters generated through our service are stored indefinitely unless removed at our discretion or upon request. We may remove content that violates our Terms of Service.</p>
+            <p>Character data is stored indefinitely unless removed at our discretion. We may remove content that violates our Terms of Service.</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">7. Your Rights</h2>
             <p>You have the right to:</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Access information about data we hold about you</li>
-              <li>Request deletion of your data</li>
+              <li>Access information about data we hold</li>
+              <li>Request deletion of your personal data</li>
               <li>Object to processing of your personal data</li>
             </ul>
             <p className="mt-2">To exercise these rights, please contact us through our social media channels.</p>
