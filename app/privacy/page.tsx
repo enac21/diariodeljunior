@@ -20,68 +20,73 @@ export default function PrivacyPage() {
 
         <div className="prose prose-invert max-w-none space-y-6 text-muted-foreground">
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">1. Information We Collect</h2>
-            <p>Diario del Junior collects minimal information necessary to provide our service:</p>
+            <h2 className="text-xl font-semibold text-foreground mb-3">About This Project</h2>
+            <p>
+              Diario del Junior is a personal, indie project — not a company or commercial service. 
+              This privacy policy explains what data is involved in a simple and transparent way.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-foreground mb-3">What Data We Store</h2>
+            <p>The application stores the following data to display characters:</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li><strong>Usage Data:</strong> We may collect anonymous usage statistics to improve our service.</li>
-              <li><strong>Technical Data:</strong> IP addresses and browser information may be logged for security purposes.</li>
+              <li><strong>Public usernames</strong> — used as the basis for character generation</li>
+              <li><strong>Generation seed</strong> — a number derived from the username</li>
+              <li><strong>Character parts</strong> — which visual components were selected</li>
+              <li><strong>Creation date</strong> — when the character was generated</li>
+            </ul>
+            <p className="mt-3">
+              All usernames are public usernames from social platforms. We do not collect private personal data, emails, or any information you submit.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-semibold text-foreground mb-3">What We Don&apos;t Collect</h2>
+            <ul className="list-disc pl-6 mt-2 space-y-1">
+              <li>No IP addresses</li>
+              <li>No cookies for tracking</li>
+              <li>No user accounts or login data</li>
+              <li>No analytics or third-party trackers</li>
             </ul>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">2. How We Use Your Information</h2>
-            <p>We use the collected information to:</p>
-            <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Display and maintain the character map and gallery</li>
-              <li>Improve and optimize our service</li>
-              <li>Protect against abuse and ensure security</li>
-            </ul>
+            <h2 className="text-xl font-semibold text-foreground mb-3">Hosting Infrastructure</h2>
+            <p>
+              This service is hosted on a third-party platform (Render). 
+              The hosting provider may log technical data such as request times and error reports for their own operational purposes. 
+              This is outside of our application and controlled by their own privacy policies.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">3. Data Storage</h2>
-            <p>Character data is generated and stored securely in our database. We implement appropriate security measures to protect data from unauthorized access or disclosure.</p>
+            <h2 className="text-xl font-semibold text-foreground mb-3">Your Rights</h2>
+            <p>
+              Since we only store public usernames (not personal data), most data protection rights do not apply. 
+              However, if you have questions or concerns, you can reach out through my social media channels.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">4. Cookies</h2>
-            <p>Diario del Junior may use essential cookies to ensure proper functionality of the service. We do not use tracking cookies or third-party analytics without your consent.</p>
+            <h2 className="text-xl font-semibold text-foreground mb-3">Children</h2>
+            <p>
+              This service is not directed at children under 13. No personal information is knowingly collected from anyone.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">5. Third-Party Services</h2>
-            <p>Our service may use third-party services for hosting and content delivery. These providers have their own privacy policies, and we encourage you to review them.</p>
+            <h2 className="text-xl font-semibold text-foreground mb-3">Changes</h2>
+            <p>
+              This policy may be updated as the project evolves. Check the &quot;Last updated&quot; date for any changes.
+            </p>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">6. Data Retention</h2>
-            <p>Character data is stored indefinitely unless removed at our discretion. We may remove content that violates our Terms of Service.</p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">7. Your Rights</h2>
-            <p>You have the right to:</p>
-            <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Access information about data we hold</li>
-              <li>Request deletion of your personal data</li>
-              <li>Object to processing of your personal data</li>
-            </ul>
-            <p className="mt-2">To exercise these rights, please contact us through our social media channels.</p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">8. Children&apos;s Privacy</h2>
-            <p>Our service is not directed to children under 13. We do not knowingly collect personal information from children. If you believe we have collected information from a child, please contact us immediately.</p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">9. Changes to This Policy</h2>
-            <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the &quot;Last updated&quot; date.</p>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mb-3">10. Contact Us</h2>
-            <p>If you have any questions about this Privacy Policy, please contact us through our social media channels.</p>
+            <h2 className="text-xl font-semibold text-foreground mb-3">Contact</h2>
+            <p>
+              Questions? Reach out through my social media channels.
+            </p>
           </section>
         </div>
       </div>
