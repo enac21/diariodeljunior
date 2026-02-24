@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Pies con zapatillas deportivas -->
+  <path d="M75 240 Q70 270 110 270 Q140 270 135 240 Z" fill="#e74c3c"/>
+  <path d="M175 240 Q170 270 210 270 Q240 270 235 240 Z" fill="#e74c3c"/>
+  <!-- Suela -->
+  <path d="M75 265 Q70 280 110 280 Q140 280 135 265" fill="#fff"/>
+  <path d="M175 265 Q170 280 210 280 Q240 280 235 265" fill="#fff"/>
+  <!-- Cordones -->
+  <line x1="90" y1="250" x2="120" y2="250" stroke="#fff" stroke-width="2"/>
+  <line x1="90" y1="255" x2="120" y2="255" stroke="#fff" stroke-width="2"/>
+  <line x1="190" y1="250" x2="220" y2="250" stroke="#fff" stroke-width="2"/>
+  <line x1="190" y1="255" x2="220" y2="255" stroke="#fff" stroke-width="2"/>
+  <!-- Logo -->
+  <circle cx="105" cy="260" r="5" fill="#fff"/>
+  <circle cx="205" cy="260" r="5" fill="#fff"/>
+</svg>

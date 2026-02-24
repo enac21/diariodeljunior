@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+  <!-- Nariz aguileña -->
+  <path d="M30 10 Q25 35 20 55 L25 55 Q30 40 35 55 L40 55 Q35 35 30 10" fill="#f5cba7"/>
+  <path d="M30 10 Q25 35 20 55" stroke="#d4a574" stroke-width="1" fill="none"/>
+  <path d="M30 10 Q35 35 40 55" stroke="#d4a574" stroke-width="1" fill="none"/>
+</svg>

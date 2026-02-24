@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="100" height="50">
+  <!-- Ojos X (cerrados/crossed) -->
+  <path d="M15 18 L25 32" stroke="#2c3e50" stroke-width="3" stroke-linecap="round"/>
+  <path d="M25 18 L15 32" stroke="#2c3e50" stroke-width="3" stroke-linecap="round"/>
+  <path d="M75 18 L85 32" stroke="#2c3e50" stroke-width="3" stroke-linecap="round"/>
+  <path d="M85 18 L75 32" stroke="#2c3e50" stroke-width="3" stroke-linecap="round"/>
+</svg>

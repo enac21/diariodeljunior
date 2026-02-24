@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Sombrero wizard -->
+  <ellipse cx="150" cy="70" rx="80" ry="20" fill="#4b0082"/>
+  <path d="M90 70 Q85 20 150 5 Q215 20 210 70" fill="#4b0082"/>
+  <path d="M95 65 Q92 25 150 12 Q208 25 205 65" fill="#5a1799"/>
+  <!-- Banda -->
+  <path d="M85 60 Q150 45 215 60" stroke="#ffd700" stroke-width="8" fill="none"/>
+  <!-- Estrellas -->
+  <text x="120" y="35" font-size="12" fill="#ffd700">★</text>
+  <text x="170" y="40" font-size="10" fill="#ffd700">★</text>
+  <text x="145" y="25" font-size="8" fill="#ffd700">★</text>
+  <!-- Luna -->
+  <path d="M180 30 Q190 25 185 40 Q175 35 180 30" fill="#ffd700"/>
+</svg>

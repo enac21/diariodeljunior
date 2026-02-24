@@ -8,7 +8,7 @@ import { createAgent, updateAgent, type CharacterAgent } from '@/lib/character-a
 import { useMapStore } from '@/lib/stores/map-store';
 import { useCharactersData } from '@/lib/hooks/useCharactersData';
 
-const PARTES = ['pies', 'cuerpo', 'cabeza', 'ojos', 'nariz', 'boca'] as const;
+const PARTES = ['pies', 'cuerpo', 'cabeza', 'accesorio', 'ojos', 'nariz', 'boca'] as const;
 type Parte = typeof PARTES[number];
 
 interface GalleryMapProps {
@@ -21,6 +21,7 @@ const LAYOUT: Record<Parte, { x: number; y: number; width: number; height: numbe
   pies: { x: 80, y: 225, width: 140, height: 55 },
   cuerpo: { x: 70, y: 105, width: 160, height: 175 },
   cabeza: { x: 70, y: 10, width: 160, height: 160 },
+  accesorio: { x: 65, y: -15, width: 170, height: 70 },
   ojos: { x: 95, y: 30, width: 110, height: 44 },
   nariz: { x: 135, y: 50, width: 30, height: 35 },
   boca: { x: 127, y: 80, width: 45, height: 25 },
@@ -295,6 +296,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
         removeCharacterPositionRef.current(character.id);
         const child = charactersContainer.children.find(c => c.label === `character-${character.id}`);
         if (child) {
+          renderedIndicesRef.current.delete(index);
           let alpha = 1;
           const fadeOut = () => {
             alpha -= 0.15;
@@ -306,9 +308,12 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             }
           };
           requestAnimationFrame(fadeOut);
+        } else {
+          renderedIndicesRef.current.delete(index);
         }
+      } else {
+        renderedIndicesRef.current.delete(index);
       }
-      renderedIndicesRef.current.delete(index);
     }
     
     let individualVisibleCount = 0;
@@ -345,6 +350,12 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
           
           if (alreadyInStage) {
             container.alpha = 1;
+            renderedIndicesRef.current.add(index);
+            continue;
+          }
+          
+          const alreadyExists = charactersContainer.children.some(c => c.label === `character-${character.id}`);
+          if (alreadyExists) {
             renderedIndicesRef.current.add(index);
             continue;
           }

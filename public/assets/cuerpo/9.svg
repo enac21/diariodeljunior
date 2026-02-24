@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150" width="100" height="150">
+  <!-- Cuerpo de robot -->
+  <rect x="20" y="15" width="60" height="50" rx="5" fill="#808080"/>
+  <rect x="25" y="20" width="50" height="40" fill="#a0a0a0"/>
+  <!-- Panel pecho -->
+  <rect x="35" y="30" width="30" height="20" fill="#1a1a1a"/>
+  <!-- Luces -->
+  <circle cx="42" cy="40" r="4" fill="#ff0000"/>
+  <circle cx="50" cy="40" r="4" fill="#00ff00"/>
+  <circle cx="58" cy="40" r="4" fill="#0000ff"/>
+  <!-- Articulaciones -->
+  <circle cx="20" cy="40" r="8" fill="#606060"/>
+  <circle cx="80" cy="40" r="8" fill="#606060"/>
+  <!-- Piernas metálicas -->
+  <rect x="28" y="65" width="18" height="60" fill="#707070"/>
+  <rect x="54" y="65" width="18" height="60" fill="#707070"/>
+  <!-- Rodillas -->
+  <circle cx="37" cy="90" r="5" fill="#505050"/>
+  <circle cx="63" cy="90" r="5" fill="#505050"/>
+</svg>

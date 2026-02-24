@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150" width="100" height="150">
+  <!-- Hoodie -->
+  <path d="M20 15 Q15 50 15 80 L20 130 L35 130 L35 90 L40 130 L60 130 L60 90 L65 130 L80 130 L85 80 Q85 50 80 15 Z" fill="#3498db"/>
+  <!-- Capucha -->
+  <path d="M30 15 Q50 5 70 15 L70 25 Q50 15 30 25 Z" fill="#2980b9"/>
+  <!-- Cuerda -->
+  <line x1="40" y1="25" x2="38" y2="50" stroke="#fff" stroke-width="2"/>
+  <line x1="60" y1="25" x2="62" y2="50" stroke="#fff" stroke-width="2"/>
+  <!-- Bolsillo -->
+  <rect x="30" y="80" width="40" height="30" rx="5" fill="#2980b9"/>
+  <!-- Mangas -->
+  <path d="M15 25 L5 60 L15 65 L25 30" fill="#3498db"/>
+  <path d="M85 25 L95 60 L85 65 L75 30" fill="#3498db"/>
+</svg>

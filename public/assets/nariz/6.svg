@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+  <!-- Nariz botón cartoon -->
+  <ellipse cx="30" cy="35" rx="12" ry="10" fill="#f5cba7"/>
+  <ellipse cx="30" cy="33" rx="10" ry="8" fill="#ffcc99"/>
+  <!-- Brillo -->
+  <ellipse cx="26" cy="30" rx="3" ry="2" fill="#fff" opacity="0.5"/>
+</svg>

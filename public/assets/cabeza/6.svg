@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Cabeza ovalada estilo anime -->
+  <ellipse cx="150" cy="120" rx="75" ry="85" fill="#ffe0bd"/>
+  <ellipse cx="150" cy="125" rx="75" ry="80" fill="#ffcc99"/>
+  <!-- Mechón de pelo -->
+  <path d="M150 35 Q170 20 165 50 Q155 35 150 45 Q145 35 135 50 Q130 20 150 35" fill="#4a3728"/>
+  <!-- Peinado -->
+  <path d="M80 80 Q75 50 100 40 Q130 30 150 35 Q170 30 200 40 Q225 50 220 80" fill="#4a3728"/>
+  <path d="M80 80 Q75 110 90 120" fill="#4a3728"/>
+  <path d="M220 80 Q225 110 210 120" fill="#4a3728"/>
+  <!-- Rubor -->
+  <ellipse cx="100" cy="140" rx="15" ry="8" fill="#ffb6c1" opacity="0.5"/>
+  <ellipse cx="200" cy="140" rx="15" ry="8" fill="#ffb6c1" opacity="0.5"/>
+</svg>

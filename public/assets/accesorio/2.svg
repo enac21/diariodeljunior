@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Beanie -->
+  <ellipse cx="150" cy="60" rx="75" ry="30" fill="#e74c3c"/>
+  <path d="M80 60 Q80 20 150 25 Q220 20 220 60" fill="#e74c3c"/>
+  <path d="M80 60 Q80 20 150 25 Q220 20 220 60" fill="#c0392b"/>
+  <!-- Ribete -->
+  <rect x="75" y="55" width="150" height="20" rx="5" fill="#c0392b"/>
+  <!-- Pompon -->
+  <circle cx="150" cy="20" r="12" fill="#c0392b"/>
+  <circle cx="150" cy="20" r="8" fill="#e74c3c"/>
+</svg>

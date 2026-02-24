@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Cabeza de zombie -->
+  <ellipse cx="150" cy="120" rx="70" ry="80" fill="#7cb37c"/>
+  <ellipse cx="150" cy="125" rx="68" ry="75" fill="#5a9a5a"/>
+  <!-- Pelo desprolijo -->
+  <path d="M90 60 L80 40 L100 50 L110 30 L130 45 L145 25 L160 45 L180 30 L200 50 L210 40 L200 60" fill="#4a6b4a"/>
+  <!-- Ojos heterocromáticos -->
+  <circle cx="115" cy="110" r="22" fill="#fff"/>
+  <circle cx="185" cy="110" r="22" fill="#fff"/>
+  <circle cx="115" cy="110" r="12" fill="#ff6b6b"/>
+  <circle cx="185" cy="110" r="15" fill="#4ecdc4"/>
+  <circle cx="115" cy="108" r="5" fill="#000"/>
+  <circle cx="185" cy="108" r="5" fill="#000"/>
+  <!-- Cicatriz -->
+  <path d="M170 80 L190 95 L175 100" stroke="#4a4a4a" stroke-width="3" fill="none"/>
+  <!-- Boca dentada -->
+  <path d="M120 160 Q150 180 180 160" stroke="#3d3d3d" stroke-width="3" fill="none"/>
+  <path d="M125 162 L125 155 M135 165 L135 158 M150 167 L150 160 M165 165 L165 158 M175 162 L175 155" stroke="#fff" stroke-width="2"/>
+</svg>

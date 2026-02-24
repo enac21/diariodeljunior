@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 150" width="100" height="150">
+  <!-- Cuerpo de científico loco -->
+  <ellipse cx="50" cy="50" rx="35" ry="40" fill="#f5f5f5"/>
+  <ellipse cx="50" cy="50" rx="35" ry="40" stroke="#333" stroke-width="2" fill="none"/>
+  <!-- Bata -->
+  <path d="M20 30 L30 20 L50 25 L70 20 L80 30 L80 90 L20 90 Z" fill="#e0e0e0"/>
+  <path d="M50 25 L50 90" stroke="#333" stroke-width="1"/>
+  <!-- Botones -->
+  <circle cx="40" cy="45" r="4" fill="#333"/>
+  <circle cx="40" cy="60" r="4" fill="#333"/>
+  <circle cx="60" cy="45" r="4" fill="#333"/>
+  <circle cx="60" cy="60" r="4" fill="#333"/>
+  <!-- Batas -->
+  <path d="M20 30 L10 80 L25 75 L30 30" fill="#e0e0e0"/>
+  <path d="M80 30 L90 80 L75 75 L70 30" fill="#e0e0e0"/>
+  <!-- Piernas -->
+  <rect x="30" y="85" width="15" height="45" fill="#333"/>
+  <rect x="55" y="85" width="15" height="45" fill="#333"/>
+</svg>

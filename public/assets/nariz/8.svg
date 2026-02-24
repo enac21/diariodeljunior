@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+  <!-- Nariz alien -->
+  <ellipse cx="30" cy="35" rx="8" ry="15" fill="#7ed6a8"/>
+  <ellipse cx="30" cy="35" rx="5" ry="12" fill="#5bc49a"/>
+  <!-- Fosas nasales -->
+  <circle cx="27" cy="38" r="2" fill="#3d8b6e"/>
+  <circle cx="33" cy="38" r="2" fill="#3d8b6e"/>
+</svg>

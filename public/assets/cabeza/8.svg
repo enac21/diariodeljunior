@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Cabeza de alien pequeño -->
+  <ellipse cx="150" cy="120" rx="60" ry="90" fill="#7ed6a8"/>
+  <ellipse cx="150" cy="125" rx="60" ry="85" fill="#5bc49a"/>
+  <!-- Ojos grandes -->
+  <ellipse cx="120" cy="110" rx="25" ry="30" fill="#1a1a2e"/>
+  <ellipse cx="180" cy="110" rx="25" ry="30" fill="#1a1a2e"/>
+  <ellipse cx="120" cy="105" rx="10" ry="15" fill="#fff"/>
+  <ellipse cx="180" cy="105" rx="10" ry="15" fill="#fff"/>
+  <!-- Antenas -->
+  <line x1="130" y1="35" x2="120" y2="10" stroke="#5bc49a" stroke-width="3"/>
+  <circle cx="120" cy="8" r="5" fill="#7ed6a8"/>
+  <line x1="170" y1="35" x2="180" y2="10" stroke="#5bc49a" stroke-width="3"/>
+  <circle cx="180" cy="8" r="5" fill="#7ed6a8"/>
+  <!-- Boca -->
+  <ellipse cx="150" cy="170" rx="15" ry="8" fill="#3d8b6e"/>
+</svg>

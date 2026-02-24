@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+  <!-- Nariz chata -->
+  <ellipse cx="30" cy="40" rx="18" ry="12" fill="#f5cba7"/>
+  <ellipse cx="30" cy="38" rx="14" ry="8" fill="#ffcc99"/>
+  <!-- Fosas -->
+  <circle cx="22" cy="40" r="4" fill="#d4a574"/>
+  <circle cx="38" cy="40" r="4" fill="#d4a574"/>
+</svg>

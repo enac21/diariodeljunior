@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Cabeza cuadrada-redondeada (estilo game) -->
+  <rect x="80" y="40" width="140" height="160" rx="40" fill="#f5d0a9"/>
+  <rect x="80" y="50" width="140" height="145" rx="35" fill="#e8c090"/>
+  <!-- Pelo en picos -->
+  <path d="M80 80 L70 40 L100 60 L120 25 L150 45 L180 25 L200 60 L230 40 L220 80" fill="#2c1810"/>
+  <!-- Ceño prominent -->
+  <path d="M100 90 Q150 85 200 90" stroke="#2c1810" stroke-width="4" fill="none"/>
+  <!-- Barbilla definida -->
+  <path d="M110 190 Q150 210 190 190" fill="#d4a574"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Pies de payaso -->
+  <ellipse cx="110" cy="250" rx="40" ry="25" fill="#fff"/>
+  <ellipse cx="190" cy="250" rx="40" ry="25" fill="#fff"/>
+  <!-- Zapatos rojos -->
+  <ellipse cx="110" cy="255" rx="35" ry="20" fill="#ff4444"/>
+  <ellipse cx="190" cy="255" rx="35" ry="20" fill="#ff4444"/>
+  <!-- Pompones -->
+  <circle cx="75" cy="250" r="8" fill="#ff0000"/>
+  <circle cx="75" cy="250" r="5" fill="#ff6666"/>
+  <circle cx="225" cy="250" r="8" fill="#ff0000"/>
+  <circle cx="225" cy="250" r="5" fill="#ff6666"/>
+  <!-- Lazo -->
+  <path d="M110 240 L120 250 L110 260 L100 250 Z" fill="#ff0000"/>
+  <path d="M190 240 L200 250 L190 260 L180 250 Z" fill="#ff0000"/>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Pies con botas de vaquero -->
+  <ellipse cx="110" cy="255" rx="35" ry="20" fill="#8b4513"/>
+  <ellipse cx="190" cy="255" rx="35" ry="20" fill="#8b4513"/>
+  <!-- Bota superior -->
+  <rect x="80" y="220" width="60" height="25" fill="#8b4513"/>
+  <rect x="160" y="220" width="60" height="25" fill="#8b4513"/>
+  <!-- Punta cuadrada -->
+  <rect x="75" y="250" width="15" height="15" fill="#6b3410"/>
+  <rect x="205" y="250" width="15" height="15" fill="#6b3410"/>
+  <!-- Espuelas -->
+  <line x1="80" y1="265" x2="65" y2="270" stroke="#c0c0c0" stroke-width="3"/>
+  <line x1="220" y1="265" x2="235" y2="270" stroke="#c0c0c0" stroke-width="3"/>
+  <circle cx="65" cy="272" r="4" fill="#c0c0c0"/>
+  <circle cx="235" cy="272" r="4" fill="#c0c0c0"/>
+</svg>

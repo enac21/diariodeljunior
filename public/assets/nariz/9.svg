@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+  <!-- Nariz grande de payaso -->
+  <circle cx="30" cy="40" r="15" fill="#ff6b6b"/>
+  <circle cx="30" cy="40" r="12" fill="#ff4444"/>
+  <!-- Brillo -->
+  <circle cx="25" cy="35" r="4" fill="#ff9999"/>
+  <!-- Resplandor -->
+  <circle cx="30" cy="40" r="18" stroke="#ff6b6b" stroke-width="2" fill="none" opacity="0.5"/>
+</svg>

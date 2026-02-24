@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Cabeza peluda/rizada -->
+  <circle cx="150" cy="120" r="75" fill="#8b5a2b"/>
+  <circle cx="100" cy="80" r="30" fill="#8b5a2b"/>
+  <circle cx="200" cy="80" r="30" fill="#8b5a2b"/>
+  <circle cx="80" cy="120" r="25" fill="#8b5a2b"/>
+  <circle cx="220" cy="120" r="25" fill="#8b5a2b"/>
+  <circle cx="90" cy="160" r="25" fill="#8b5a2b"/>
+  <circle cx="210" cy="160" r="25" fill="#8b5a2b"/>
+  <!-- Cara -->
+  <circle cx="150" cy="130" r="50" fill="#f0c090"/>
+  <circle cx="150" cy="135" r="48" fill="#e8b080"/>
+  <!-- Rubor -->
+  <ellipse cx="115" cy="145" rx="12" ry="6" fill="#ff9999" opacity="0.4"/>
+  <ellipse cx="185" cy="145" rx="12" ry="6" fill="#ff9999" opacity="0.4"/>
+</svg>

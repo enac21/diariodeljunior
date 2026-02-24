@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Auriculares -->
+  <path d="M80 60 Q80 20 150 15 Q220 20 220 60" fill="none" stroke="#333" stroke-width="8"/>
+  <!-- Auriculares -->
+  <ellipse cx="75" cy="70" rx="15" ry="25" fill="#333"/>
+  <ellipse cx="225" cy="70" rx="15" ry="25" fill="#333"/>
+  <ellipse cx="75" cy="70" rx="10" ry="18" fill="#555"/>
+  <ellipse cx="225" cy="70" rx="10" ry="18" fill="#555"/>
+  <!-- Diadema -->
+  <path d="M80 50 Q80 25 150 20 Q220 25 220 50" fill="none" stroke="#222" stroke-width="6"/>
+  <!-- Micrófono -->
+  <line x1="90" y1="80" x2="120" y2="100" stroke="#333" stroke-width="3"/>
+  <circle cx="120" cy="100" r="6" fill="#333"/>
+  <circle cx="120" cy="100" r="3" fill="#666"/>
+</svg>

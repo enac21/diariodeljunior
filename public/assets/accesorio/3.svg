@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+  <!-- Gorro fiesta -->
+  <path d="M100 60 L120 15 L150 40 L180 15 L200 60" fill="#ffd700"/>
+  <path d="M100 60 L200 60" stroke="#ffd700" stroke-width="15"/>
+  <!-- Estrellas -->
+  <text x="125" y="35" font-size="15" fill="#fff">★</text>
+  <text x="165" y="30" font-size="12" fill="#fff">★</text>
+  <text x="145" y="25" font-size="10" fill="#fff">★</text>
+  <!-- Colores -->
+  <circle cx="120" cy="20" r="4" fill="#ff6b6b"/>
+  <circle cx="150" cy="35" r="4" fill="#6bff6b"/>
+  <circle cx="180" cy="20" r="4" fill="#6b6bff"/>
+</svg>

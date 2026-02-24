@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" width="60" height="80">
+  <!-- Nariz robot -->
+  <rect x="22" y="20" width="16" height="30" rx="3" fill="#808080"/>
+  <rect x="25" y="23" width="10" height="24" rx="2" fill="#a0a0a0"/>
+  <!-- Luces nasales -->
+  <circle cx="27" cy="35" r="2" fill="#00ff00"/>
+  <circle cx="33" cy="35" r="2" fill="#00ff00"/>
+  <!-- Sensor -->
+  <line x1="30" y1="20" x2="30" y2="12" stroke="#606060" stroke-width="2"/>
+  <circle cx="30" cy="10" r="3" fill="#ff0000"/>
+</svg>

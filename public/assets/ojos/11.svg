@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 50" width="100" height="50">
+  <!-- Ojos de robot LED -->
+  <rect x="8" y="10" width="35" height="25" rx="3" fill="#1a1a1a"/>
+  <rect x="57" y="10" width="35" height="25" rx="3" fill="#1a1a1a"/>
+  <!-- Ojos LED brillantes -->
+  <rect x="12" y="14" width="27" height="17" fill="#00ffff"/>
+  <rect x="61" y="14" width="27" height="17" fill="#00ffff"/>
+  <!-- Glitch -->
+  <rect x="15" y="16" width="8" height="3" fill="#ff00ff" opacity="0.7"/>
+  <rect x="68" y="22" width="10" height="2" fill="#ff00ff" opacity="0.7"/>
+</svg>
