@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
-import { CharacterSVG } from '@/components/CharacterSVG';
+import Image from 'next/image';
 import type { Character } from '@/lib/types/character';
 
 interface CharacterModalProps {
@@ -47,9 +47,12 @@ export function CharacterModal({ character, onClose }: CharacterModalProps) {
           <div className="relative">
             <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 blur-xl" />
             <div className="relative rounded-xl border border-border/50 bg-background/50 p-4">
-              <CharacterSVG
-                seleccion={character.selectedParts}
-                activeId={character.username}
+              <Image
+                src={`/avatars/${character.username}.png`}
+                alt={character.username}
+                width={256}
+                height={256}
+                className="object-contain"
               />
             </div>
           </div>

@@ -26,7 +26,7 @@ const LAYOUT: Record<Parte, { x: number; y: number; width: number; height: numbe
   boca: { x: 127, y: 80, width: 45, height: 25 },
 };
 
-const CHARACTER_SIZE = 280;
+const CHARACTER_SIZE = 256;
 const LOGO_SIZE = 120;
 const INITIAL_RADIUS = 350;
 const LOAD_PADDING = 400;
@@ -182,8 +182,8 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
         fontWeight: '500'
       }
     });
-    nameText.x = -nameText.width / 2;
-    nameText.y = -CHARACTER_SIZE / 2 - 24;
+    nameText.x = 0;
+    nameText.y = 0;
     nameText.alpha = 0.8;
     wrapper.addChild(nameText);
     
@@ -202,6 +202,25 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
       } catch (e) {
         console.error(`[GalleryMap] Error loading ${parte}:`, e);
       }
+    }
+
+    try {
+      const avatarTexture = await Assets.load({
+        src: `/avatars/${character.username}.png`,
+      });
+      const avatarSprite = new Sprite(avatarTexture);
+      const scale = CHARACTER_SIZE / Math.max(avatarTexture.width, avatarTexture.height);
+      avatarSprite.width = avatarTexture.width * scale;
+      avatarSprite.height = avatarTexture.height * scale;
+      avatarSprite.x = -avatarSprite.width / 2;
+      avatarSprite.y = -avatarSprite.height / 2;
+      charContainer.removeChildren();
+      charContainer.addChild(avatarSprite);
+      
+      nameText.x = -nameText.width / 2;
+      nameText.y = avatarSprite.height / 2 + 8;
+    } catch (e) {
+      console.error(`[GalleryMap] Error loading avatar image:`, e);
     }
     
     wrapper.on('pointerdown', () => {
@@ -736,18 +755,15 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             if (!agent) return;
             
             const character = charactersDataRef.current.get(index);
-            const isChatting = false;
-            
-            updateAgent(agent, deltaTime, visibleAgents, isChatting);
             
             if (character) {
               const container = charactersContainer.children.find(
                 c => c.label === `character-${character.id}`
               );
               if (container) {
-                container.x = agent.x;
-                container.y = agent.y;
-                setCharacterPositionRef.current(character.id, { x: agent.x, y: agent.y });
+                container.x = agent.homeX;
+                container.y = agent.homeY;
+                setCharacterPositionRef.current(character.id, { x: agent.homeX, y: agent.homeY });
               }
             }
           });

@@ -181,9 +181,12 @@ export default function GaleriaPage() {
                 >
                   <div className="relative flex items-center justify-center bg-gradient-to-br from-muted/30 to-background p-6">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                    <CharacterSVG
-                      seleccion={character.selectedParts}
-                      activeId={character.username}
+                    <Image
+                      src={`/avatars/${character.username}.png`}
+                      alt={character.username}
+                      width={280}
+                      height={280}
+                      className="object-contain"
                     />
                   </div>
                   <div className="border-t border-border/50 p-4">
