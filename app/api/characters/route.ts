@@ -10,7 +10,7 @@ const SEARCH_MAX_LIMIT = 20;
 
 function parsePagination(limit: string | null, offset: string | null) {
   const parsedLimit = parseInt(limit || '') || PAGINATION_DEFAULT_LIMIT;
-  const parsedOffset = Math.max(parseInt(offset || '') || 0, 0);
+  const parsedOffset = Math.max(parseInt(offset || '') || 0,0);
   return {
     limit: Math.min(Math.max(parsedLimit, 1), PAGINATION_MAX_LIMIT),
     offset: parsedOffset,

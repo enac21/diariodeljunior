@@ -26,21 +26,27 @@ const nouns = [
   'Shark', 'Whale', 'Dolphin', 'Panther', 'Leopard', 'Jaguar', 'Cobra', 'Viper'
 ]
 
-function generateUsername(index: number): string {
-  const adjIndex = index % adjectives.length
-  const nounIndex = (index * 7) % nouns.length
-  const number = Math.floor(index / adjectives.length) + 1
-  return `${adjectives[adjIndex]}${nouns[nounIndex]}${number}`
+function generateUsername(): string {
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)]
+  const noun = nouns[Math.floor(Math.random() * nouns.length)]
+  const num = Math.floor(Math.random() * 999) + 1
+  return `${adj}${noun}${num}`
 }
 
 async function main() {
   console.log(`Seeding ${count} characters...`)
   
-  const characters: any[] = []
-  
   for (let i = 0; i < count; i++) {
-    const username = generateUsername(i)
-    const seed = stringToSeed(username)
+    let username = generateUsername()
+    let seed = stringToSeed(username)
+    
+    let existing = await prisma.character.findUnique({ where: { username } })
+    while (existing) {
+      username = generateUsername()
+      seed = stringToSeed(username)
+      existing = await prisma.character.findUnique({ where: { username } })
+    }
+    
     const selectedParts = seleccionarPartes(seed)
     
     try {
@@ -50,20 +56,17 @@ async function main() {
       console.error(`Error generating avatar for ${username}:`, e)
     }
     
-    characters.push({
-      username,
-      seed,
-      generatorVersion: 1,
-      selectedParts,
+    await prisma.character.create({
+      data: {
+        username,
+        seed,
+        generatorVersion: 1,
+        selectedParts: selectedParts as any,
+      }
     })
   }
   
-  const result = await prisma.character.createMany({
-    data: characters,
-    skipDuplicates: true,
-  })
-  
-  console.log(`Created ${result.count} characters`)
+  console.log(`Created ${count} characters`)
 }
 
 main()

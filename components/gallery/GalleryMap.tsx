@@ -15,8 +15,8 @@ interface GalleryMapProps {
 }
 
 const CHARACTER_SIZE = 256;
-const LOGO_SIZE = 120;
-const INITIAL_RADIUS = 350;
+const LOGO_SIZE = 160;
+const INITIAL_RADIUS = 120;
 const LOAD_PADDING = 400;
 const BATCH_SIZE = 100;
 const REMOVE_PADDING = 300;
@@ -444,7 +444,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
           logoContainer.addChild(logoSprite);
           
           const coordText = new Text({
-            text: '0, 0',
+            text: '0,0',
             style: { 
               fontSize: 35, 
               fill: 0xF97316, 
@@ -459,12 +459,12 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
           const ctaText = new Text({
             text: 'Síguenos para conseguir\ntu personaje',
             style: { 
-              fontSize: 20, 
+              fontSize: 26, 
               fill: 0xffffff, 
               fontFamily: 'system-ui, sans-serif',
-              fontWeight: '500',
+              fontWeight: '600',
               align: 'center',
-              lineHeight: 26,
+              lineHeight: 32,
             }
           });
           ctaText.anchor.set(0.5);
