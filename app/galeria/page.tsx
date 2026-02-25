@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CharacterSVG } from '@/components/CharacterSVG';
 import { Footer } from '@/components/Footer';
 import type { Character } from '@/lib/types/character';
 

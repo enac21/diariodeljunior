@@ -1,30 +1,18 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Application, Container, FederatedPointerEvent, Text, Graphics, Assets, Sprite, Texture } from 'pixi.js';
+import { Application, Container, FederatedPointerEvent, Text, Graphics, Assets, Sprite } from 'pixi.js';
 import type { Character } from '@/lib/types/character';
 import { circlePosition, getRingRange, getVisibleRings } from '@/lib/circle-position';
-import { createAgent, updateAgent, type CharacterAgent } from '@/lib/character-agent';
+import { createAgent, type CharacterAgent } from '@/lib/character-agent';
 import { useMapStore } from '@/lib/stores/map-store';
 import { useCharactersData } from '@/lib/hooks/useCharactersData';
-
-const PARTES = ['pies', 'cuerpo', 'cabeza', 'ojos', 'nariz', 'boca'] as const;
-type Parte = typeof PARTES[number];
 
 interface GalleryMapProps {
   onCharacterClick: (character: Character) => void;
   focusCharacterId: string | null;
   onLogoClick: () => void;
 }
-
-const LAYOUT: Record<Parte, { x: number; y: number; width: number; height: number }> = {
-  pies: { x: 80, y: 225, width: 140, height: 55 },
-  cuerpo: { x: 70, y: 105, width: 160, height: 175 },
-  cabeza: { x: 70, y: 10, width: 160, height: 160 },
-  ojos: { x: 95, y: 30, width: 110, height: 44 },
-  nariz: { x: 135, y: 50, width: 30, height: 35 },
-  boca: { x: 127, y: 80, width: 45, height: 25 },
-};
 
 const CHARACTER_SIZE = 256;
 const LOGO_SIZE = 120;
@@ -33,24 +21,7 @@ const LOAD_PADDING = 400;
 const BATCH_SIZE = 100;
 const REMOVE_PADDING = 300;
 
-const textureCache = new Map<string, Texture>();
 const characterContainerCache = new Map<string, Container>();
-
-async function loadPartTexture(parte: Parte, variante: number): Promise<Texture> {
-  const key = `${parte}-${variante}`;
-  
-  if (textureCache.has(key)) {
-    return textureCache.get(key)!;
-  }
-
-  const texture = await Assets.load({
-    src: `/assets/${parte}/${variante}.svg`,
-    data: { width: LAYOUT[parte].width, height: LAYOUT[parte].height }
-  });
-  
-  textureCache.set(key, texture);
-  return texture;
-}
 
 export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: GalleryMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -190,20 +161,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     const charContainer = new Container();
     wrapper.addChild(charContainer);
     
-    for (const parte of PARTES) {
-      try {
-        const texture = await loadPartTexture(parte, character.selectedParts[parte]);
-        const sprite = new Sprite(texture);
-        sprite.x = LAYOUT[parte].x - CHARACTER_SIZE / 2;
-        sprite.y = LAYOUT[parte].y - CHARACTER_SIZE / 2;
-        sprite.width = LAYOUT[parte].width;
-        sprite.height = LAYOUT[parte].height;
-        charContainer.addChild(sprite);
-      } catch (e) {
-        console.error(`[GalleryMap] Error loading ${parte}:`, e);
-      }
-    }
-
     try {
       const avatarTexture = await Assets.load({
         src: `/avatars/${character.username}.png`,
@@ -214,7 +171,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
       avatarSprite.height = avatarTexture.height * scale;
       avatarSprite.x = -avatarSprite.width / 2;
       avatarSprite.y = -avatarSprite.height / 2;
-      charContainer.removeChildren();
       charContainer.addChild(avatarSprite);
       
       nameText.x = -nameText.width / 2;

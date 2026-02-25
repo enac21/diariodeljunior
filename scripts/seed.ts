@@ -1,7 +1,9 @@
 import 'dotenv/config'
 import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from '@prisma/adapter-pg'
-import { stringToSeed, seleccionarPartes } from '../lib/character-generator'
+import { stringToSeed, seleccionarPartes, generateAndSaveAvatar } from '../lib/character-generator'
+import fs from 'fs'
+import path from 'path'
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -40,6 +42,13 @@ async function main() {
     const username = generateUsername(i)
     const seed = stringToSeed(username)
     const selectedParts = seleccionarPartes(seed)
+    
+    try {
+      await generateAndSaveAvatar(username, selectedParts)
+      console.log(`Generated avatar for ${username}`)
+    } catch (e) {
+      console.error(`Error generating avatar for ${username}:`, e)
+    }
     
     characters.push({
       username,
