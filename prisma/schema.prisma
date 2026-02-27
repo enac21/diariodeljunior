@@ -8,8 +8,8 @@ datasource db {
 
 model Character {
   id               String   @id @default(uuid()) @db.Uuid
-  username         String   @unique
-  seed             Int
+  username         String
+  seed             Int      @unique
   generatorVersion Int      @default(1)
   selectedParts    Json
   createdAt        DateTime @default(now())

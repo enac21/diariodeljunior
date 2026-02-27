@@ -40,11 +40,10 @@ async function main() {
     let username = generateUsername()
     let seed = stringToSeed(username)
     
-    let existing = await prisma.character.findUnique({ where: { username } })
+    const existing = await prisma.character.findUnique({ where: { seed } })
     while (existing) {
       username = generateUsername()
       seed = stringToSeed(username)
-      existing = await prisma.character.findUnique({ where: { username } })
     }
     
     const selectedParts = seleccionarPartes(seed)

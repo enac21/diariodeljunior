@@ -453,11 +453,11 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             }
           });
           coordText.anchor.set(0.5);
-          coordText.y = LOGO_SIZE / 2 + 28;
+          coordText.y = LOGO_SIZE / 2 + 15;
           logoContainer.addChild(coordText);
           
           const ctaText = new Text({
-            text: 'Síguenos para conseguir\ntu personaje',
+            text: 'Unete a Discord para conseguir\ntu personaje',
             style: { 
               fontSize: 26, 
               fill: 0xffffff, 

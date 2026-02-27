@@ -7,10 +7,21 @@ import { stringToSeed, seleccionarPartes, generateAndSaveAvatar } from '@/lib/ch
 const PAGINATION_DEFAULT_LIMIT = 50;
 const PAGINATION_MAX_LIMIT = 100;
 const SEARCH_MAX_LIMIT = 20;
+const USERNAME_MAX_LENGTH = 24;
+
+interface User {
+  id: string;
+  username: string;
+  joinedAt: string;
+}
+
+interface RequestBody {
+  users: User[];
+}
 
 function parsePagination(limit: string | null, offset: string | null) {
   const parsedLimit = parseInt(limit || '') || PAGINATION_DEFAULT_LIMIT;
-  const parsedOffset = Math.max(parseInt(offset || '') || 0,0);
+  const parsedOffset = Math.max(parseInt(offset || '') || 0, 0);
   return {
     limit: Math.min(Math.max(parsedLimit, 1), PAGINATION_MAX_LIMIT),
     offset: parsedOffset,
@@ -37,12 +48,7 @@ export async function GET(request: NextRequest) {
       );
 
       const characters = await prisma.character.findMany({
-        where: {
-          username: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
+        where: { username: { contains: search, mode: 'insensitive' } },
         orderBy: { createdAt: 'desc' },
         take: limit,
       });
@@ -50,17 +56,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ characters, total: characters.length, limit, offset: 0 });
     }
 
-    const { limit, offset } = parsePagination(
-      searchParams.get('limit'),
-      searchParams.get('offset')
-    );
+    const { limit, offset } = parsePagination(searchParams.get('limit'), searchParams.get('offset'));
 
     const [characters, total] = await Promise.all([
-      prisma.character.findMany({
-        orderBy: { createdAt: 'desc' },
-        take: limit,
-        skip: offset,
-      }),
+      prisma.character.findMany({ orderBy: { createdAt: 'desc' }, take: limit, skip: offset }),
       prisma.character.count(),
     ]);
 
@@ -73,8 +72,42 @@ export async function GET(request: NextRequest) {
   }
 }
 
-const USERNAME_MIN_LENGTH = 2;
-const USERNAME_MAX_LENGTH = 24;
+async function createCharacter(userId: string, username: string) {
+  if (!username || typeof username !== 'string') {
+    return null;
+  }
+
+  const cleanUsername = username.trim().normalize('NFC').slice(0, USERNAME_MAX_LENGTH);
+
+  if (cleanUsername.length < 2) {
+    return null;
+  }
+
+  const seed = stringToSeed(userId);
+  const existingBySeed = await prisma.character.findUnique({ where: { seed } });
+  if (existingBySeed) {
+    return { character: existingBySeed, created: false };
+  }
+
+  const selectedParts = seleccionarPartes(seed);
+
+  try {
+    await generateAndSaveAvatar(cleanUsername, selectedParts);
+  } catch (e) {
+    console.error(`Error generating avatar for ${cleanUsername}:`, e);
+  }
+
+  const character = await prisma.character.create({
+    data: {
+      username: cleanUsername,
+      seed,
+      selectedParts: selectedParts as any,
+      generatorVersion: 1,
+    },
+  });
+
+  return { character, created: true };
+}
 
 export async function POST(request: NextRequest) {
   const { success, resetIn } = rateLimit(extractIp(request), RATE_LIMIT_PRESETS.POST);
@@ -86,42 +119,31 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { username } = body;
-
-    if (!username || typeof username !== 'string') {
-      return NextResponse.json({ error: 'Username is required' }, { status: 400 });
+    let body: RequestBody;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
 
-    const cleanUsername = username.trim().normalize('NFC').slice(0, USERNAME_MAX_LENGTH);
-
-    if (cleanUsername.length < USERNAME_MIN_LENGTH) {
-      return NextResponse.json({ error: 'Username must be at least 2 characters' }, { status: 400 });
+    if (!body?.users || !Array.isArray(body.users) || body.users.length === 0) {
+      return NextResponse.json({ error: 'Invalid body: expected { users: [...] }' }, { status: 400 });
     }
 
-    const existingCharacter = await prisma.character.findUnique({
-      where: { username: cleanUsername },
+    const results = { created: 0, skipped: 0, errors: 0 };
+
+    for (const user of body.users) {
+      const result = await createCharacter(user.id, user.username);
+      if (result === null) results.errors++;
+      else if (result.created) results.created++;
+      else results.skipped++;
+    }
+
+    return NextResponse.json({
+      message: 'Users processed',
+      total: body.users.length,
+      results,
     });
-
-    if (existingCharacter) {
-      return NextResponse.json(existingCharacter);
-    }
-
-    const seed = stringToSeed(cleanUsername);
-    const selectedParts = seleccionarPartes(seed);
-
-    await generateAndSaveAvatar(cleanUsername, selectedParts);
-
-    const character = await prisma.character.create({
-      data: {
-        username: cleanUsername,
-        seed,
-        selectedParts: selectedParts as any,
-        generatorVersion: 1,
-      },
-    });
-
-    return NextResponse.json(character, { status: 201 });
   } catch (error) {
     return handleApiError(error, 'POST /api/characters');
   }
