@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Footer } from '@/components/Footer';
+import { ClickRevealAvatar } from '@/components/gallery/ClickRevealAvatar';
 import type { Character } from '@/lib/types/character';
 
 const BATCH_SIZE = 20;
@@ -40,7 +41,7 @@ export default function GaleriaPage() {
 
   const loadMore = useCallback(async () => {
     if (loadingMore || characters.length >= total) return;
-    
+
     setLoadingMore(true);
     try {
       const offset = characters.length;
@@ -87,7 +88,7 @@ export default function GaleriaPage() {
         <div className="absolute left-1/4 top-0 -translate-y-1/2 h-[400px] w-[400px] rounded-full bg-orange-500/10 blur-[120px]" />
         <div className="absolute right-1/4 bottom-0 translate-y-1/2 h-[400px] w-[400px] rounded-full bg-amber-500/5 blur-[100px]" />
       </div>
-      
+
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 md:px-12">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-600">
@@ -98,7 +99,7 @@ export default function GaleriaPage() {
             <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-orange-600 bg-clip-text text-transparent"> Junior</span>
           </span>
         </Link>
-        
+
         <div className="flex items-center gap-1">
           <span className="rounded-lg bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
             Galería
@@ -161,19 +162,20 @@ export default function GaleriaPage() {
               {characters.map((character) => (
                 <div
                   key={character.id}
-                  className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 animate-fade-in-up"
+                  className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 animate-fade-in-up flex flex-col h-full"
                 >
-                  <div className="relative flex items-center justify-center bg-gradient-to-br from-muted/30 to-background p-6">
+                  <div className="relative flex-1 flex items-center justify-center bg-gradient-to-br from-muted/30 to-background min-h-[250px] sm:min-h-[280px]">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                    <Image
+                    <ClickRevealAvatar
                       src={character.imageUrl || `/avatars/${character.username}.png`}
                       alt={character.username}
                       width={280}
                       height={280}
-                      className="object-contain"
+                      className="absolute inset-0"
+                      characterId={character.id}
                     />
                   </div>
-                  <div className="border-t border-border/50 p-4">
+                  <div className="border-t border-border/50 p-4 shrink-0 bg-card/80 backdrop-blur-sm relative z-20">
                     <h3 className="truncate font-semibold text-foreground transition-colors">
                       {character.username}
                     </h3>
@@ -210,7 +212,7 @@ export default function GaleriaPage() {
             </div>
           </>
         )}
-        
+
         <div className="mt-8 text-center text-xs text-muted-foreground/50">
           Diario del Junior is not affiliated with, endorsed, or sponsored by Sulake Suomi. Habbo assets used under Fan Site Policy.
         </div>
