@@ -2,8 +2,6 @@ import 'dotenv/config'
 import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from '@prisma/adapter-pg'
 import { stringToSeed, seleccionarPartes, generateAndSaveAvatar } from '../lib/character-generator'
-import fs from 'fs'
-import path from 'path'
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,

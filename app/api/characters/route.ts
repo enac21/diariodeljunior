@@ -90,9 +90,10 @@ async function createCharacter(userId: string, username: string) {
   }
 
   const selectedParts = seleccionarPartes(seed);
+  let imageUrl: string | null = null;
 
   try {
-    await generateAndSaveAvatar(cleanUsername, selectedParts);
+    imageUrl = await generateAndSaveAvatar(cleanUsername, selectedParts);
   } catch (e) {
     console.error(`Error generating avatar for ${cleanUsername}:`, e);
   }
@@ -103,6 +104,7 @@ async function createCharacter(userId: string, username: string) {
       seed,
       selectedParts: selectedParts as any,
       generatorVersion: 1,
+      imageUrl,
     },
   });
 

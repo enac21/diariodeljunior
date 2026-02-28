@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
           username: true,
           seed: true,
           selectedParts: true,
+          imageUrl: true,
           createdAt: true,
         },
         take: limit,

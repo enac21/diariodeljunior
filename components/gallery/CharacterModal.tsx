@@ -48,7 +48,7 @@ export function CharacterModal({ character, onClose }: CharacterModalProps) {
             <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-orange-500/20 to-amber-500/20 blur-xl" />
             <div className="relative rounded-xl border border-border/50 bg-background/50 p-2">
               <Image
-                src={`/avatars/${character.username}.png`}
+                src={character.imageUrl || `/avatars/${character.username}.png`}
                 alt={character.username}
                 width={200}
                 height={200}

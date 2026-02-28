@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { uploadAvatar } from './supabase';
 
 export interface Seleccion {
   gender: 'M' | 'F';
@@ -126,16 +127,8 @@ export async function generateAndSaveAvatar(username: string, parts: Seleccion, 
         throw new Error('Empty response from Habbo API');
       }
 
-      const publicDir = path.join(process.cwd(), 'public', 'avatars');
-      if (!fs.existsSync(publicDir)) {
-        fs.mkdirSync(publicDir, { recursive: true });
-      }
-
-      const imagePath = `/avatars/${username}.png`;
-      const fullPath = path.join(process.cwd(), 'public', imagePath);
-      fs.writeFileSync(fullPath, imageBuffer);
-
-      return imagePath;
+      const publicUrl = await uploadAvatar(imageBuffer, `${username}.png`);
+      return publicUrl;
     } catch (error) {
       lastError = error as Error;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

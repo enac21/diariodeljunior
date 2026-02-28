@@ -12,6 +12,7 @@ model Character {
   seed             Int      @unique
   generatorVersion Int      @default(1)
   selectedParts    Json
+  imageUrl         String?
   createdAt        DateTime @default(now())
 
   @@index([createdAt])

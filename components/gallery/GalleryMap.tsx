@@ -161,9 +161,11 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     const charContainer = new Container();
     wrapper.addChild(charContainer);
     
+    const avatarSrc = character.imageUrl || `/avatars/${character.username}.png`;
+    
     try {
       const avatarTexture = await Assets.load({
-        src: `/avatars/${character.username}.png`,
+        src: avatarSrc,
       });
       const avatarSprite = new Sprite(avatarTexture);
       const scale = CHARACTER_SIZE / Math.max(avatarTexture.width, avatarTexture.height);
