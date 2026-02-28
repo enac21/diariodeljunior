@@ -6,5 +6,6 @@ export interface Character {
   seed: number;
   selectedParts: Seleccion;
   generatorVersion: number;
+  imageUrl: string | null;
   createdAt: string;
 }

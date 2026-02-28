@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { rateLimit, extractIp, RATE_LIMIT_PRESETS } from '@/lib/rate-limit';
 import { handleApiError } from '@/lib/api-utils';
+import { stringToSeed } from '@/lib/character-generator';
 
 export async function GET(
   request: NextRequest,
@@ -25,18 +26,19 @@ export async function GET(
       );
     }
 
-    const character = await prisma.character.findUnique({
-      where: { username },
+    const seed = stringToSeed(username);
+    const characters = await prisma.character.findMany({
+      where: { seed },
     });
 
-    if (!character) {
+    if (characters.length === 0) {
       return NextResponse.json(
         { error: 'Character not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(character, {
+    return NextResponse.json(characters[0], {
       headers: { 'Cache-Control': 'public, max-age=60, stale-while-revalidate=300' },
     });
   } catch (error) {

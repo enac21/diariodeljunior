@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import { PrismaClient } from "@prisma/client"
 import { PrismaPg } from '@prisma/adapter-pg'
-import { stringToSeed, seleccionarPartes } from '../lib/character-generator'
+import { stringToSeed, seleccionarPartes, generateAndSaveAvatar } from '../lib/character-generator'
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -24,37 +24,48 @@ const nouns = [
   'Shark', 'Whale', 'Dolphin', 'Panther', 'Leopard', 'Jaguar', 'Cobra', 'Viper'
 ]
 
-function generateUsername(index: number): string {
-  const adjIndex = index % adjectives.length
-  const nounIndex = (index * 7) % nouns.length
-  const number = Math.floor(index / adjectives.length) + 1
-  return `${adjectives[adjIndex]}${nouns[nounIndex]}${number}`
+function generateUsername(): string {
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)]
+  const noun = nouns[Math.floor(Math.random() * nouns.length)]
+  const num = Math.floor(Math.random() * 999) + 1
+  return `${adj}${noun}${num}`
 }
 
 async function main() {
   console.log(`Seeding ${count} characters...`)
   
-  const characters: any[] = []
-  
   for (let i = 0; i < count; i++) {
-    const username = generateUsername(i)
-    const seed = stringToSeed(username)
-    const selectedParts = seleccionarPartes(seed)
+    let username = generateUsername()
+    let seed = stringToSeed(username)
     
-    characters.push({
-      username,
-      seed,
-      generatorVersion: 1,
-      selectedParts,
+    const existing = await prisma.character.findUnique({ where: { seed } })
+    while (existing) {
+      username = generateUsername()
+      seed = stringToSeed(username)
+    }
+    
+    const selectedParts = seleccionarPartes(seed)
+    let imageUrl: string | null = null
+    
+    try {
+      imageUrl = await generateAndSaveAvatar(username, selectedParts)
+      console.log(`Generated avatar for ${username}: ${imageUrl}`)
+    } catch (e) {
+      console.error(`Error generating avatar for ${username}:`, e)
+    }
+    
+    await prisma.character.create({
+      data: {
+        username,
+        seed,
+        generatorVersion: 1,
+        selectedParts: selectedParts as any,
+        imageUrl,
+      }
     })
   }
   
-  const result = await prisma.character.createMany({
-    data: characters,
-    skipDuplicates: true,
-  })
-  
-  console.log(`Created ${result.count} characters`)
+  console.log(`Created ${count} characters`)
 }
 
 main()

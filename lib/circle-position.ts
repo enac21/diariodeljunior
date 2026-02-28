@@ -1,4 +1,4 @@
-const RING_SPACING = 400;
+const RING_SPACING = 200;
 const CHARACTERS_PER_RING_BASE = 8;
 
 export interface Position {
