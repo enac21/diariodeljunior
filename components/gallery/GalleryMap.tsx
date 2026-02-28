@@ -459,7 +459,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
           logoContainer.addChild(coordText);
           
           const ctaText = new Text({
-            text: 'Unete a Discord para conseguir\ntu personaje',
+            text: 'Únete a Discord para conseguir\ntu personaje',
             style: { 
               fontSize: 26, 
               fill: 0xffffff, 

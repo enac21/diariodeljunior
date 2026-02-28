@@ -45,10 +45,11 @@ async function main() {
     }
     
     const selectedParts = seleccionarPartes(seed)
+    let imageUrl: string | null = null
     
     try {
-      await generateAndSaveAvatar(username, selectedParts)
-      console.log(`Generated avatar for ${username}`)
+      imageUrl = await generateAndSaveAvatar(username, selectedParts)
+      console.log(`Generated avatar for ${username}: ${imageUrl}`)
     } catch (e) {
       console.error(`Error generating avatar for ${username}:`, e)
     }
@@ -59,6 +60,7 @@ async function main() {
         seed,
         generatorVersion: 1,
         selectedParts: selectedParts as any,
+        imageUrl,
       }
     })
   }

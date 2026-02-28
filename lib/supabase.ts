@@ -7,6 +7,7 @@ function getS3Client(): S3Client {
     const accessKeyId = process.env.SUPABASE_ACCESS_KEY_ID;
     const secretAccessKey = process.env.SUPABASE_SECRET_ACCESS_KEY;
     const bucket = process.env.SUPABASE_BUCKET;
+    const endpoint = process.env.SUPABASE_S3_ENDPOINT;
 
     if (!accessKeyId || !secretAccessKey || !bucket) {
       throw new Error('AWS credentials not configured');
@@ -15,7 +16,7 @@ function getS3Client(): S3Client {
     s3Client = new S3Client({
       forcePathStyle: true,
       region: 'us-east-1',
-      endpoint: 'https://iknzuotokabnfjrjsafx.storage.supabase.co/storage/v1/s3',
+      endpoint,
       credentials: {
         accessKeyId,
         secretAccessKey,
@@ -36,6 +37,7 @@ export async function uploadAvatar(buffer: Buffer, filename: string): Promise<st
     Key: filename,
     Body: buffer,
     ContentType: 'image/png',
+    CacheControl: 'public, max-age=31536000, immutable',
   });
 
   await client.send(command);
