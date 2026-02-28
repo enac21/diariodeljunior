@@ -119,16 +119,6 @@ export default function GaleriaPage() {
               <span className="font-semibold text-foreground">{total}</span> personajes únicos creados
             </p>
           </div>
-          <Link
-            href="/"
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 active:scale-[0.98]"
-          >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Crear Personaje
-          </Link>
-        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -161,14 +151,8 @@ export default function GaleriaPage() {
               No hay personajes aún
             </h2>
             <p className="mt-2 text-sm text-muted-foreground max-w-sm">
-              Crea tu primer personaje usando cualquier ID y aparecerá aquí automáticamente.
+              Los personajes aparecerán aquí automáticamente cuando se procesen desde TikTok.
             </p>
-            <Link
-              href="/"
-              className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:scale-[0.98]"
-            >
-              Crear primer personaje
-            </Link>
           </div>
         ) : (
           <>
