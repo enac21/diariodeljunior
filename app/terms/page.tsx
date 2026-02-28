@@ -19,6 +19,22 @@ export default function TermsPage() {
         <p className="text-muted-foreground mb-8">Last updated: February 2026</p>
 
         <div className="prose prose-invert max-w-none space-y-6 text-muted-foreground">
+          <section className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-4">
+            <h2 className="text-xl font-semibold text-foreground mb-3">Important Disclaimer</h2>
+            <p className="text-sm">
+              <strong>Diario del Junior is not affiliated with, endorsed, sponsored, or specifically approved by Sulake Suomi or its affiliates.</strong> 
+              Diario del Junior may use the trademarks and other intellectual property of Habbo, which is permitted under the{' '}
+              <a 
+                href="https://help.habbo.com/hc/en-us/articles/115005631069-Habbo-Fan-Site-Policy" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+              >
+                Habbo Fan Site Policy
+              </a>.
+            </p>
+          </section>
+
           <section>
             <h2 className="text-xl font-semibold text-foreground mb-3">About This Project</h2>
             <p>

@@ -119,6 +119,7 @@ export default function GaleriaPage() {
               <span className="font-semibold text-foreground">{total}</span> personajes únicos creados
             </p>
           </div>
+        </div>
 
         {loading ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -209,6 +210,10 @@ export default function GaleriaPage() {
             </div>
           </>
         )}
+        
+        <div className="mt-8 text-center text-xs text-muted-foreground/50">
+          Diario del Junior is not affiliated with, endorsed, or sponsored by Sulake Suomi. Habbo assets used under Fan Site Policy.
+        </div>
       </div>
 
       <Footer />

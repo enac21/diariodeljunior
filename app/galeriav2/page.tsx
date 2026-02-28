@@ -112,6 +112,10 @@ export default function GaleriaV2Page() {
         isOpen={isLinksModalOpen}
         onClose={() => setIsLinksModalOpen(false)}
       />
+      
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 text-[10px] text-muted-foreground/50 text-center max-w-xs px-2">
+        Diario del Junior is not affiliated with, endorsed, or sponsored by Sulake Suomi. Habbo assets used under Fan Site Policy.
+      </div>
     </main>
   );
 }
