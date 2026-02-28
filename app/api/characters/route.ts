@@ -9,6 +9,58 @@ const PAGINATION_MAX_LIMIT = 100;
 const SEARCH_MAX_LIMIT = 20;
 const USERNAME_MAX_LENGTH = 24;
 
+const HABBO_BATCH_THRESHOLD = parseInt(process.env.HABBO_BATCH_THRESHOLD || '20');
+const HABBO_DELAY_SMALL_BATCH_MS = parseInt(process.env.HABBO_DELAY_SMALL_BATCH_MS || '2000');
+const HABBO_DELAY_LARGE_BATCH_MS = parseInt(process.env.HABBO_DELAY_LARGE_BATCH_MS || '25000');
+
+function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function randomDelay(maxMs: number): Promise<void> {
+  return delay(Math.random() * maxMs);
+}
+
+function randomDelayRange(minMs: number, maxMs: number): Promise<void> {
+  const range = maxMs - minMs;
+  const actualDelay = minMs + Math.random() * range;
+  return delay(actualDelay);
+}
+
+async function processWithRateLimit(
+  users: User[],
+  processor: (user: User) => Promise<{ created: number; skipped: number; errors: number }>
+) {
+  const results = { created: 0, skipped: 0, errors: 0 };
+  const isLargeBatch = users.length > HABBO_BATCH_THRESHOLD;
+
+  const processUser = async (user: User, index: number) => {
+    const result = await processor(user);
+    
+    if (result.created) results.created++;
+    else if (result.skipped) results.skipped++;
+    else results.errors++;
+
+    if (index < users.length - 1) {
+      if (isLargeBatch) {
+        const minDelay = Math.max(HABBO_DELAY_LARGE_BATCH_MS - 5000, 2000);
+        const maxDelay = 5000;
+        console.log(`[RateLimit] Large batch: random delay between ${minDelay}ms and ${maxDelay}ms...`);
+        await randomDelayRange(minDelay, maxDelay);
+      } else {
+        console.log(`[RateLimit] Small batch: random delay up to ${HABBO_DELAY_SMALL_BATCH_MS}ms...`);
+        await randomDelay(HABBO_DELAY_SMALL_BATCH_MS);
+      }
+    }
+  };
+
+  for (let i = 0; i < users.length; i++) {
+    await processUser(users[i], i);
+  }
+
+  return results;
+}
+
 interface User {
   id: string;
   username: string;
@@ -132,14 +184,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid body: expected { users: [...] }' }, { status: 400 });
     }
 
-    const results = { created: 0, skipped: 0, errors: 0 };
-
-    for (const user of body.users) {
+    const results = await processWithRateLimit(body.users, async (user) => {
       const result = await createCharacter(user.id, user.username);
-      if (result === null) results.errors++;
-      else if (result.created) results.created++;
-      else results.skipped++;
-    }
+      if (result === null) return { created: 0, skipped: 0, errors: 1 };
+      if (result.created) return { created: 1, skipped: 0, errors: 0 };
+      return { created: 0, skipped: 1, errors: 0 };
+    });
 
     return NextResponse.json({
       message: 'Users processed',
