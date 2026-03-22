@@ -204,6 +204,7 @@ export function OnboardingModal({ isOpen, onClose, allVisible = false }: Onboard
           backdrop-filter: blur(6px);
           -webkit-backdrop-filter: blur(6px);
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           padding: 16px;
@@ -324,64 +325,44 @@ export function OnboardingModal({ isOpen, onClose, allVisible = false }: Onboard
         }
 
         /* ────────────────────────────────────────────
-           Indicador de clic con mano animada
+           Indicador de clic con cursor Windows
         ──────────────────────────────────────────── */
         .onboarding-click-hint {
-          position: absolute;
-          bottom: 22px;
-          left: 50%;
-          transform: translateX(-50%);
+          position: relative;
+          margin-top: 24px;
           display: flex;
+          flex-direction: column;
           align-items: center;
           gap: 10px;
           pointer-events: none;
           white-space: nowrap;
+          transition: opacity 0.4s ease;
         }
 
-        /* Riel de movimiento de la mano */
-        .onboarding-hand-track {
+        .onboarding-cursor-icon {
           position: relative;
-          width: 80px;
-          height: 28px;
-          overflow: visible;
+          filter: drop-shadow(0 2px 8px rgba(249,115,22,0.45));
+          animation: cursor-click 2s ease-in-out infinite;
         }
 
-        .onboarding-hand-icon {
-          position: absolute;
-          top: 0;
-          left: 0;
-          animation: hand-slide 2s cubic-bezier(0.45,0,0.55,1) infinite;
-          filter: drop-shadow(0 2px 6px rgba(249,115,22,0.4));
+        .onboarding-cursor-icon svg {
+          display: block;
         }
 
-        /* tap animation on the hand */
-        .onboarding-hand-icon svg {
-          animation: hand-tap 2s cubic-bezier(0.45,0,0.55,1) infinite;
+        @keyframes cursor-click {
+          0%, 30%  { transform: scale(1); }
+          40%      { transform: scale(0.82) translateY(3px); }
+          55%      { transform: scale(1); }
+          100%     { transform: scale(1); }
         }
 
-        @keyframes hand-slide {
-          0%   { left: 0px;  opacity: 0; }
-          10%  { opacity: 1; }
-          80%  { left: 56px; opacity: 1; }
-          92%  { left: 60px; opacity: 0; }
-          100% { left: 60px; opacity: 0; }
-        }
-
-        @keyframes hand-tap {
-          0%, 35%  { transform: scale(1) rotate(0deg); }
-          50%      { transform: scale(0.82) rotate(-8deg); }
-          65%      { transform: scale(1) rotate(0deg); }
-          100%     { transform: scale(1) rotate(0deg); }
-        }
-
-        /* Las pequeñas líneas de "impacto" del clic */
+        /* Ripples de clic bajo el cursor */
         .onboarding-click-ripples {
           position: absolute;
-          top: 50%;
-          right: -2px;
-          transform: translateY(-50%);
-          width: 16px;
-          height: 16px;
+          top: 6px;
+          left: 2px;
+          width: 18px;
+          height: 18px;
         }
 
         .onboarding-click-ripple {
@@ -393,15 +374,14 @@ export function OnboardingModal({ isOpen, onClose, allVisible = false }: Onboard
           animation: ripple-expand 2s ease-out infinite;
         }
 
-        .onboarding-click-ripple:nth-child(2) { animation-delay: 0.2s; }
-        .onboarding-click-ripple:nth-child(3) { animation-delay: 0.4s; }
+        .onboarding-click-ripple:nth-child(2) { animation-delay: 0.15s; }
+        .onboarding-click-ripple:nth-child(3) { animation-delay: 0.3s; }
 
         @keyframes ripple-expand {
-          0%   { transform: scale(0.5); opacity: 0; }
-          45%  { opacity: 0; }
-          50%  { transform: scale(0.5); opacity: 0.8; }
-          90%  { transform: scale(2.5); opacity: 0; }
-          100% { opacity: 0; }
+          0%, 35%  { transform: scale(0.5); opacity: 0; }
+          40%      { transform: scale(0.5); opacity: 0.8; }
+          70%      { transform: scale(3); opacity: 0; }
+          100%     { opacity: 0; }
         }
 
         .onboarding-hint-label {
@@ -554,11 +534,11 @@ export function OnboardingModal({ isOpen, onClose, allVisible = false }: Onboard
         }
       `}</style>
 
-            {/* Backdrop — clic para cerrar cuando step=2 */}
+            {/* Backdrop — cualquier clic avanza o cierra */}
             <div
                 className="onboarding-backdrop"
                 style={{ opacity: visible ? 1 : 0 }}
-                onClick={effectiveStep >= 2 ? handleClose : undefined}
+                onClick={handleContainerClick}
             >
                 {/* Botón X */}
                 <button
@@ -579,50 +559,36 @@ export function OnboardingModal({ isOpen, onClose, allVisible = false }: Onboard
                         opacity: visible ? 1 : 0,
                         transform: visible ? 'translateY(0)' : 'translateY(28px)',
                     }}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        handleContainerClick();
-                    }}
                 >
                     <DiscordCard active={effectiveStep >= 0} />
                     <RevealCard active={effectiveStep >= 1} />
                     <EnjoyCard active={effectiveStep >= 2} onClose={handleClose} />
                 </div>
 
-                {/* Indicador animado de clic — solo visible mientras no estén todas activas */}
-                {effectiveStep < 2 && (
-                    <div className="onboarding-click-hint" style={{ opacity: visible ? 1 : 0 }}>
-                        {/* Mano que se desliza de izquierda a derecha */}
-                        <div className="onboarding-hand-track">
-                            <div className="onboarding-hand-icon">
-                                {/* ripples en el punto de clic */}
-                                <div className="onboarding-click-ripples">
-                                    <div className="onboarding-click-ripple" />
-                                    <div className="onboarding-click-ripple" />
-                                    <div className="onboarding-click-ripple" />
-                                </div>
-                                <svg
-                                    width="22"
-                                    height="22"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="#f97316"
-                                    strokeWidth="1.8"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    aria-hidden="true"
-                                >
-                                    {/* Mano señalando / haciendo clic */}
-                                    <path d="M9 11V6a1.5 1.5 0 0 1 3 0v5" />
-                                    <path d="M12 11V5a1.5 1.5 0 0 1 3 0v6" />
-                                    <path d="M15 11V8a1.5 1.5 0 0 1 3 0v5c0 3.314-2.686 6-6 6a6 6 0 0 1-6-6v-2a1.5 1.5 0 0 1 3 0v2" />
-                                    <path d="M9 11V9a1.5 1.5 0 0 0-3 0v2" />
-                                </svg>
-                            </div>
+                {/* Indicador de clic con cursor Windows — se oculta con opacity para no mover el layout */}
+                <div className="onboarding-click-hint" style={{ opacity: visible && effectiveStep < 2 ? 1 : 0 }}>
+                    <div className="onboarding-cursor-icon">
+                        {/* Ripples de clic */}
+                        <div className="onboarding-click-ripples">
+                            <div className="onboarding-click-ripple" />
+                            <div className="onboarding-click-ripple" />
+                            <div className="onboarding-click-ripple" />
                         </div>
-                        <span className="onboarding-hint-label">Haz clic para continuar</span>
+                        {/* Cursor tipo Windows (flecha) */}
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="#f97316"
+                            stroke="hsl(30 5% 8%)"
+                            strokeWidth="1"
+                            aria-hidden="true"
+                        >
+                            <path d="M5 3l14 9.5-6.5 1.2L9.2 21z" />
+                        </svg>
                     </div>
-                )}
+                    <span className="onboarding-hint-label">Haz clic para continuar</span>
+                </div>
             </div>
         </>
     );
