@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { GalleryMap } from '@/components/gallery/GalleryMap';
 import { CharacterModal } from '@/components/gallery/CharacterModal';
 import { LinksModal } from '@/components/gallery/LinksModal';
+import { OnboardingModal } from '@/components/gallery/OnboardingModal';
 import { useRevealedStore } from '@/lib/stores/revealed-store';
 import { useCharactersData } from '@/lib/hooks/useCharactersData';
 import type { Character } from '@/lib/types/character';
@@ -16,8 +17,31 @@ export default function GaleriaV2Page() {
   const [searchResults, setSearchResults] = useState<Character[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingInfoMode, setOnboardingInfoMode] = useState(false);
 
   const revealAll = useRevealedStore((state) => state.revealAll);
+
+  // Mostrar onboarding solo en la primera visita (sin personajes descubiertos y sin flag de sesión)
+  useEffect(() => {
+    const alreadySeen = sessionStorage.getItem('onboarding-seen');
+    if (alreadySeen) return;
+    const { revealedCharacters, allRevealed } = useRevealedStore.getState();
+    if (revealedCharacters.length === 0 && !allRevealed) {
+      setShowOnboarding(true);
+      setOnboardingInfoMode(false);
+    }
+  }, []);
+
+  const handleCloseOnboarding = useCallback(() => {
+    sessionStorage.setItem('onboarding-seen', '1');
+    setShowOnboarding(false);
+  }, []);
+
+  const handleOpenInfo = useCallback(() => {
+    setOnboardingInfoMode(true);
+    setShowOnboarding(true);
+  }, []);
 
   const handleRevealAll = () => {
     revealAll();
@@ -53,6 +77,20 @@ export default function GaleriaV2Page() {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden">
+      {/* Botón de info — abre el onboarding con todas las tarjetas visibles */}
+      <button
+        onClick={handleOpenInfo}
+        className="absolute right-[calc(1rem+env(safe-area-inset-right))] top-[calc(1rem+env(safe-area-inset-top))] z-10 flex h-[38px] w-[38px] items-center justify-center rounded-lg border border-border/50 bg-card/80 backdrop-blur-sm text-muted-foreground transition-all hover:border-primary/30 hover:bg-card hover:text-foreground"
+        title="Cómo funciona el mapa"
+        aria-label="Información sobre el mapa"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+      </button>
+
       <nav className="absolute left-[calc(1rem+env(safe-area-inset-left))] top-[calc(1rem+env(safe-area-inset-top))] z-10 flex items-center gap-2">
         <Link href="/" className="flex items-center gap-2 rounded-lg border border-border/50 bg-card/80 backdrop-blur-sm px-4 py-2 text-sm font-medium text-foreground transition-all hover:border-primary/30 hover:bg-card">
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -117,6 +155,12 @@ export default function GaleriaV2Page() {
           )}
         </div>
       </div>
+
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onClose={handleCloseOnboarding}
+        allVisible={onboardingInfoMode}
+      />
 
       <GalleryMap
         onCharacterClick={setSelectedCharacter}
