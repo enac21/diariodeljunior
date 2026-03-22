@@ -3,7 +3,7 @@ interface Vector2 {
   y: number;
 }
 
-export type AgentState = 'idle' | 'walking';
+type AgentState = 'idle' | 'walking';
 
 export interface CharacterAgent {
   index: number;
@@ -92,16 +92,7 @@ export function updateAgent(
   agent: CharacterAgent,
   deltaTime: number,
   visibleAgents: CharacterAgent[],
-  isChatting: boolean = false
 ): void {
-  if (isChatting) {
-    agent.vx *= 0.9;
-    agent.vy *= 0.9;
-    agent.x += agent.vx * deltaTime * 0.001;
-    agent.y += agent.vy * deltaTime * 0.001;
-    return;
-  }
-
   agent.stateTimer += deltaTime;
   
   if (agent.stateTimer >= agent.nextStateChange) {
