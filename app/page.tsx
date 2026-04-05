@@ -15,8 +15,9 @@ export default function Page() {
     const fetchData = async () => {
       try {
         const res = await fetch('/api/characters/count');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        setTotalCharacters(data.total);
+        setTotalCharacters(typeof data.total === 'number' ? data.total : 0);
       } catch {
         setTotalCharacters(0);
       }
@@ -61,7 +62,7 @@ export default function Page() {
               {totalCharacters === null ? (
                 <span className="inline-block h-4 w-16 animate-pulse rounded bg-muted-foreground/20" />
               ) : (
-                `${totalCharacters.toLocaleString()} personajes en el mapa`
+                `${(totalCharacters ?? 0).toLocaleString()} personajes en el mapa`
               )}
             </div>
 
