@@ -39,24 +39,37 @@ export default function Page() {
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navegación superior — sin bordes */}
         <nav className="flex items-center justify-center gap-6 px-6 py-5">
-          <Link
-            href="/galeriav2"
-            className="group flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <svg className="h-4 w-4 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-            </svg>
-            <span className="font-medium group-hover:text-primary transition-colors">Explorar el Mapa</span>
-          </Link>
-          <Link
-            href="/galeria"
-            className="group flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <svg className="h-4 w-4 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-            </svg>
-            <span className="font-medium group-hover:text-primary transition-colors">Ver Galería</span>
-          </Link>
+          <div className="relative group/tip">
+            <Link
+              href="/galeriav2"
+              className="group flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <svg className="h-4 w-4 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              <span className="font-medium group-hover:text-primary transition-colors">Explorar el Mapa</span>
+            </Link>
+            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-52 rounded-lg border border-border/50 bg-card/95 px-3 py-2 text-xs text-muted-foreground shadow-lg backdrop-blur-sm opacity-0 translate-y-1 transition-all duration-200 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 z-50">
+              <p className="font-medium text-foreground mb-0.5">Mapa interactivo</p>
+              <p>Explora a todos los personajes de la comunidad en un mapa visual en tiempo real.</p>
+            </div>
+          </div>
+
+          <div className="relative group/tip">
+            <Link
+              href="/galeria"
+              className="group flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <svg className="h-4 w-4 group-hover:text-primary transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+              </svg>
+              <span className="font-medium group-hover:text-primary transition-colors">Ver Galería</span>
+            </Link>
+            <div className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-52 rounded-lg border border-border/50 bg-card/95 px-3 py-2 text-xs text-muted-foreground shadow-lg backdrop-blur-sm opacity-0 translate-y-1 transition-all duration-200 group-hover/tip:opacity-100 group-hover/tip:translate-y-0 z-50">
+              <p className="font-medium text-foreground mb-0.5">Galería de personajes</p>
+              <p>Navega por todos los personajes generados de la comunidad en formato cuadrícula.</p>
+            </div>
+          </div>
         </nav>
 
         <div className="flex-1 flex flex-col items-center justify-start px-6 pt-10 pb-12">
@@ -70,12 +83,12 @@ export default function Page() {
               <span className="bg-gradient-to-r from-amber-400 via-orange-500 to-orange-600 bg-clip-text text-transparent">Junior</span>
             </h1>
 
-            <p className="text-lg text-muted-foreground md:text-xl max-w-md mb-4">
-              Explora el mundo de la programación conmigo
+            <p className="text-lg text-muted-foreground md:text-xl max-w-md mb-6">
+              Recursos y consejos que me hubiera gustado saber cuando era junior.
             </p>
 
             {/* Contador bajo el subtítulo */}
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-muted/30 px-4 py-1.5 text-sm text-muted-foreground">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/50 bg-muted/30 px-4 py-1.5 text-sm text-muted-foreground">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />

@@ -2,20 +2,20 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
-const geist = Geist({ 
+const geist = Geist({
   subsets: ['latin'],
   variable: '--font-geist',
 })
 
-const geistMono = Geist_Mono({ 
+const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
 })
 
 export const metadata: Metadata = {
-  title: 'Diario del Junior - Explora el Mapa de Personajes',
-  description: 'Descubre personajes únicos generados proceduralmente. Explora el mapa interactivo y sígueme en mis redes sociales.',
-  keywords: ['procedural', 'character generator', 'SVG', 'random', 'seed', 'map'],
+  title: 'Diario del Junior - Todo lo que me gustaría haber sabido cuando era junior',
+  description: 'Accede a todos nuestras redes y proyectos desde aquí',
+  keywords: ['programacion', 'desarrollador junior', 'procedural', 'character generator'],
 }
 
 export const viewport: Viewport = {
