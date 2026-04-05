@@ -196,6 +196,9 @@ npx tsx scripts/clean.ts
 
 ### Historial de Cambios
 
+- **[2026-04-05]:** Añadidos tooltips CSS en los botones de navegación superior (`app/page.tsx`): al pasar el cursor sobre "Explorar el Mapa" y "Ver Galería" aparece una tarjeta con título y descripción breve, usando `group/tip` de Tailwind sin JS adicional.
+- **[2026-04-05]:** Fix resiliencia ante fallo de BD en la página principal (`app/page.tsx`): se valida `res.ok` antes de leer la respuesta del API, se comprueba que `data.total` sea un número, y se añade `?? 0` como fallback defensivo en el render para evitar `toLocaleString` sobre `undefined`.
+
 #### v0.2.0 - Migración a Habbo + S3 (Feb 2026)
 - Sistema de generación de personajes migrate de SVGs a API de Habbo
 - Integración con AWS S3 para almacenamiento de avatares
