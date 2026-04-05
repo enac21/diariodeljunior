@@ -76,11 +76,3 @@ export function getVisibleRings(
   return { minRing, maxRing: Math.max(minRing, maxRing) };
 }
 
-export function getTotalCharactersUpToRing(ring: number): number {
-  if (ring <= 0) return 0;
-  let total = 0;
-  for (let r = 1; r <= ring; r++) {
-    total += CHARACTERS_PER_RING_BASE * r;
-  }
-  return total;
-}

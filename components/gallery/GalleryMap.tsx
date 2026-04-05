@@ -5,7 +5,7 @@ import { Application, Container, FederatedPointerEvent, Text, Graphics, Assets, 
 import type { Character } from '@/lib/types/character';
 import { circlePosition, getRingRange, getVisibleRings } from '@/lib/circle-position';
 import { createAgent, type CharacterAgent } from '@/lib/character-agent';
-import { useMapStore } from '@/lib/stores/map-store';
+
 import { useCharactersData } from '@/lib/hooks/useCharactersData';
 import { useRevealedStore } from '@/lib/stores/revealed-store';
 
@@ -35,18 +35,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const [visibleCount, setVisibleCount] = useState(0);
   const [fps, setFps] = useState(0);
 
-  const { setWorldContainer, setCharacterPosition, removeCharacterPosition } = useMapStore();
   const { charactersDataRef, totalRef, fetchTotal, ensureLoaded, get: getCharacter, clear: clearCharactersData } = useCharactersData();
-
-  const setWorldContainerRef = useRef(setWorldContainer);
-  const setCharacterPositionRef = useRef(setCharacterPosition);
-  const removeCharacterPositionRef = useRef(removeCharacterPosition);
-
-  useEffect(() => {
-    setWorldContainerRef.current = setWorldContainer;
-    setCharacterPositionRef.current = setCharacterPosition;
-    removeCharacterPositionRef.current = removeCharacterPosition;
-  }, [setWorldContainer, setCharacterPosition, removeCharacterPosition]);
 
   const lastPointerRef = useRef({ x: 0, y: 0 });
   const isDraggingRef = useRef(false);
@@ -438,7 +427,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     for (const index of toRemove) {
       const character = charactersDataRef.current.get(index);
       if (character) {
-        removeCharacterPositionRef.current(character.id);
         const child = charactersContainer.children.find(c => c.label === `character-${character.id}`);
         if (child) {
           let alpha = 1;
@@ -858,12 +846,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             pulseArrowRef.current();
           }
 
-          setWorldContainerRef.current({
-            x: worldContainer.x,
-            y: worldContainer.y,
-            scale: worldContainer.scale.x,
-          });
-
           fpsFramesRef.current++;
           if (currentTime - fpsLastTimeRef.current >= 1000) {
             setFps(fpsFramesRef.current);
@@ -890,7 +872,6 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
               if (container) {
                 container.x = agent.homeX;
                 container.y = agent.homeY;
-                setCharacterPositionRef.current(character.id, { x: agent.homeX, y: agent.homeY });
               }
             }
           });
