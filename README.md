@@ -196,6 +196,7 @@ npx tsx scripts/clean.ts
 
 ### Historial de Cambios
 
+- **[2026-04-05]:** Pulido de la página principal (`app/page.tsx`): nav superior sin bordes (texto limpio con separador ·); logo ampliado a 112px; contador movido bajo el subtítulo; contenido desplazado hacia arriba con justify-start + pt-10.
 - **[2026-04-05]:** Fix resiliencia ante fallo de BD en la página principal (`app/page.tsx`): se valida `res.ok` antes de leer la respuesta del API, se comprueba que `data.total` sea un número, y se añade `?? 0` como fallback defensivo en el render para evitar `toLocaleString` sobre `undefined`.
 
 #### v0.2.0 - Migración a Habbo + S3 (Feb 2026)
