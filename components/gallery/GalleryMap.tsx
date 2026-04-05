@@ -126,7 +126,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
     setZoom(100);
   }, [focusCharacterId]);
 
-  const createCharacterContainer = useCallback(async (character: Character, index: number): Promise<Container> => {
+  const createCharacterContainer = useCallback((character: Character, index: number): Container => {
     const cacheKey = character.id;
 
     if (characterContainerCache.has(cacheKey)) {
@@ -176,61 +176,64 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
 
     const avatarSrc = character.imageUrl || `/avatars/${character.username}.png`;
 
-    try {
-      const avatarTexture = await Assets.load({
-        src: avatarSrc,
-      });
-      const avatarSprite = new Sprite(avatarTexture);
+    // Placeholder sprite — texture loaded async so the map stays interactive
+    const avatarSprite = new Sprite();
+    avatarSprite.alpha = 0;
+    charContainer.addChild(avatarSprite);
+
+    const giftWrapWidth = CHARACTER_SIZE * 0.9;
+    const giftWrapHeight = CHARACTER_SIZE * 1.1;
+
+    const giftBg = new Graphics();
+    giftBg.roundRect(-giftWrapWidth / 2, -giftWrapHeight / 2 - 10, giftWrapWidth, giftWrapHeight, 16);
+    giftBg.fill({ color: 0x1f1f1f });
+    giftContainer.addChild(giftBg);
+
+    Assets.load('/logo.png').then(logoTexture => {
+      const logoPatternSprite = new Sprite(logoTexture);
+      logoPatternSprite.anchor.set(0.5);
+      logoPatternSprite.y = -10;
+      const patternScale = (giftWrapWidth * 0.7) / Math.max(logoTexture.width, logoTexture.height);
+      logoPatternSprite.scale.set(patternScale);
+      logoPatternSprite.alpha = 0.5;
+      logoPatternSprite.tint = 0x888888;
+      giftContainer.addChildAt(logoPatternSprite, 1);
+    }).catch(() => {});
+
+    const giftRing = new Graphics();
+    giftRing.roundRect(-giftWrapWidth / 2, -giftWrapHeight / 2 - 10, giftWrapWidth, giftWrapHeight, 16);
+    giftRing.stroke({ width: 4, color: 0xf97316, alpha: 0.6 });
+    giftContainer.addChild(giftRing);
+
+    charContainer.addChild(giftContainer);
+    const isAlreadyRevealed = useRevealedStore.getState().isRevealed(character.id);
+
+    if (isAlreadyRevealed) {
+      giftContainer.alpha = 0;
+      giftContainer.renderable = false;
+      charContainer.scale.set(1);
+    } else {
+      charContainer.scale.set(0.95);
+    }
+
+    nameText.x = -nameText.width / 2;
+    nameText.y = (giftWrapHeight / 2) + 12;
+
+    // Load avatar texture in background — map remains interactive
+    Assets.load({ src: avatarSrc }).then(avatarTexture => {
       const scale = CHARACTER_SIZE / Math.max(avatarTexture.width, avatarTexture.height);
+      avatarSprite.texture = avatarTexture;
       avatarSprite.width = avatarTexture.width * scale;
       avatarSprite.height = avatarTexture.height * scale;
       avatarSprite.x = -avatarSprite.width / 2;
       avatarSprite.y = -avatarSprite.height / 2;
-      charContainer.addChild(avatarSprite);
 
-      const giftWrapWidth = CHARACTER_SIZE * 0.9;
-      const giftWrapHeight = CHARACTER_SIZE * 1.1;
-
-      const giftBg = new Graphics();
-      giftBg.roundRect(-giftWrapWidth / 2, -giftWrapHeight / 2 - 10, giftWrapWidth, giftWrapHeight, 16);
-      giftBg.fill({ color: 0x1f1f1f });
-      giftContainer.addChild(giftBg);
-
-      try {
-        const logoTexture = await Assets.load('/logo.png');
-        const logoPatternSprite = new Sprite(logoTexture);
-        logoPatternSprite.anchor.set(0.5);
-        logoPatternSprite.y = -10;
-        const patternScale = (giftWrapWidth * 0.7) / Math.max(logoTexture.width, logoTexture.height);
-        logoPatternSprite.scale.set(patternScale);
-        logoPatternSprite.alpha = 0.5;
-        logoPatternSprite.tint = 0x888888;
-        giftContainer.addChild(logoPatternSprite);
-      } catch (e) {
+      if (useRevealedStore.getState().isRevealed(character.id)) {
+        avatarSprite.alpha = 1;
       }
-
-      const giftRing = new Graphics();
-      giftRing.roundRect(-giftWrapWidth / 2, -giftWrapHeight / 2 - 10, giftWrapWidth, giftWrapHeight, 16);
-      giftRing.stroke({ width: 4, color: 0xf97316, alpha: 0.6 });
-      giftContainer.addChild(giftRing);
-
-      charContainer.addChild(giftContainer);
-      const isAlreadyRevealed = useRevealedStore.getState().isRevealed(character.id);
-
-      if (isAlreadyRevealed) {
-        giftContainer.alpha = 0;
-        giftContainer.renderable = false;
-        charContainer.scale.set(1);
-      } else {
-        avatarSprite.alpha = 0;
-        charContainer.scale.set(0.95);
-      }
-
-      nameText.x = -nameText.width / 2;
-      nameText.y = (giftWrapHeight / 2) + 12;
-    } catch (e) {
+    }).catch(e => {
       console.error(`[GalleryMap] Error loading avatar image:`, e);
-    }
+    });
 
     wrapper.on('pointerdown', (e) => {
       if (!isPinchingRef.current) {
@@ -473,7 +476,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
         if (!character) continue;
 
         try {
-          const container = await createCharacterContainer(character, index);
+          const container = createCharacterContainer(character, index);
 
           const alreadyInStage = charactersContainer.children.includes(container);
 
@@ -702,7 +705,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
 
         setLoading(false);
 
-        await updateVisibleCharacters(charactersContainer, worldContainer, viewWidth, viewHeight);
+        updateVisibleCharacters(charactersContainer, worldContainer, viewWidth, viewHeight);
 
         app.stage.on('pointerdown', (e: FederatedPointerEvent) => {
           isDraggingRef.current = true;
