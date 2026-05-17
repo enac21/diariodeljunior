@@ -8,11 +8,14 @@ import { createAgent, type CharacterAgent } from '@/lib/character-agent';
 
 import { useCharactersData } from '@/lib/hooks/useCharactersData';
 import { useRevealedStore } from '@/lib/stores/revealed-store';
+import { ChatOverlay } from './ChatOverlay';
+import type { ScreenPosition } from './ChatOverlay';
 
 interface GalleryMapProps {
   onCharacterClick: (character: Character) => void;
   focusCharacterId: string | null;
   onLogoClick: () => void;
+  onPositionReady?: (getPosition: (discordId: string) => ScreenPosition | null) => void;
 }
 
 const CHARACTER_SIZE = 256;
@@ -23,7 +26,7 @@ const REMOVE_PADDING = 300;
 
 const characterContainerCache = new Map<string, Container>();
 
-export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: GalleryMapProps) {
+export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick, onPositionReady }: GalleryMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const appRef = useRef<Application | null>(null);
   const worldContainerRef = useRef<Container | null>(null);
@@ -34,6 +37,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const [zoom, setZoom] = useState(100);
   const [visibleCount, setVisibleCount] = useState(0);
   const [fps, setFps] = useState(0);
+  const [worldTransform, setWorldTransform] = useState({ scale: 1, offsetX: 0, offsetY: 0, width: 0, height: 0 });
 
   const { charactersDataRef, totalRef, fetchTotal, ensureLoaded, get: getCharacter, clear: clearCharactersData } = useCharactersData();
 
@@ -56,6 +60,7 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   const followedIndexRef = useRef<number | null>(null);
   const onLogoClickRef = useRef(onLogoClick);
   const pulseArrowRef = useRef<(() => void) | null>(null);
+  const getPositionRef = useRef<((discordId: string) => ScreenPosition | null) | null>(null);
 
   useEffect(() => {
     onCharacterClickRef.current = onCharacterClick;
@@ -64,6 +69,29 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
   useEffect(() => {
     onLogoClickRef.current = onLogoClick;
   }, [onLogoClick]);
+
+  useEffect(() => {
+    const getPosition = (discordId: string): ScreenPosition | null => {
+      let foundIndex = -1
+      charactersDataRef.current.forEach((char, index) => {
+        if (char.discordId === discordId) {
+          foundIndex = index
+        }
+      })
+
+      if (foundIndex === -1) {
+        return null
+      }
+
+      const agent = agentsRef.current.get(foundIndex)
+      if (!agent) return null
+
+      return { x: agent.homeX, y: agent.homeY }
+    }
+
+    getPositionRef.current = getPosition
+    onPositionReady?.(getPosition)
+  }, [onPositionReady])
 
   useEffect(() => {
     const unsub = useRevealedStore.subscribe((state) => {
@@ -856,6 +884,16 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
             fpsLastTimeRef.current = currentTime;
           }
 
+          if (worldContainer && app) {
+            setWorldTransform({
+              scale: worldContainer.scale.x,
+              offsetX: worldContainer.x,
+              offsetY: worldContainer.y,
+              width: app.screen.width,
+              height: app.screen.height,
+            })
+          }
+
           const visibleAgents: CharacterAgent[] = [];
           renderedIndicesRef.current.forEach(index => {
             const agent = agentsRef.current.get(index);
@@ -937,8 +975,16 @@ export function GalleryMap({ onCharacterClick, focusCharacterId, onLogoClick }: 
         </div>
       )}
 
-      {!loading && !error && (
+       {!loading && !error && (
         <>
+          <ChatOverlay
+            getCharacterScreenPosition={getPositionRef.current || (() => null)}
+            worldScale={worldTransform.scale}
+            worldOffsetX={worldTransform.offsetX}
+            worldOffsetY={worldTransform.offsetY}
+            canvasWidth={worldTransform.width}
+            canvasHeight={worldTransform.height}
+          />
           <div className="pointer-events-auto absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] left-[calc(1rem+env(safe-area-inset-left))] z-10 flex flex-col gap-2">
             <button
               onClick={() => handleZoom(true)}

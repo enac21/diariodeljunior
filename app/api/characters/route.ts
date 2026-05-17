@@ -65,6 +65,7 @@ interface User {
   id: string;
   username: string;
   joinedAt: string;
+  discordId?: string;
 }
 
 interface RequestBody {
@@ -124,7 +125,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function createCharacter(userId: string, username: string) {
+async function createCharacter(userId: string, username: string, discordId?: string) {
   if (!username || typeof username !== 'string') {
     return null;
   }
@@ -152,6 +153,7 @@ async function createCharacter(userId: string, username: string) {
 
   const character = await prisma.character.create({
     data: {
+      discordId: discordId || null,
       username: cleanUsername,
       seed,
       selectedParts: selectedParts as any,
@@ -185,7 +187,7 @@ export async function POST(request: NextRequest) {
     }
 
     const results = await processWithRateLimit(body.users, async (user) => {
-      const result = await createCharacter(user.id, user.username);
+      const result = await createCharacter(user.id, user.username, user.discordId);
       if (result === null) return { created: 0, skipped: 0, errors: 1 };
       if (result.created) return { created: 1, skipped: 0, errors: 0 };
       return { created: 0, skipped: 1, errors: 0 };

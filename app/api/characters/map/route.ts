@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'asc' },
         select: {
           id: true,
+          discordId: true,
           username: true,
           seed: true,
           selectedParts: true,

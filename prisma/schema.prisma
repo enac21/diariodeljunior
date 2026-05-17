@@ -8,6 +8,7 @@ datasource db {
 
 model Character {
   id               String   @id @default(uuid()) @db.Uuid
+  discordId        String?  @unique
   username         String
   seed             Int      @unique
   generatorVersion Int      @default(1)
