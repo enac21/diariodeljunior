@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { GalleryMap } from '@/components/gallery/GalleryMap';
 import { CharacterModal } from '@/components/gallery/CharacterModal';
@@ -8,7 +8,10 @@ import { LinksModal } from '@/components/gallery/LinksModal';
 import { OnboardingModal } from '@/components/gallery/OnboardingModal';
 import { useRevealedStore } from '@/lib/stores/revealed-store';
 import { useCharactersData } from '@/lib/hooks/useCharactersData';
+import { useSocket } from '@/lib/hooks/useSocket';
+import { useChatStore } from '@/lib/stores/chat-store';
 import type { Character } from '@/lib/types/character';
+import type { ScreenPosition } from '@/components/gallery/ChatOverlay';
 
 export default function GaleriaV2Page() {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
@@ -19,8 +22,17 @@ export default function GaleriaV2Page() {
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingInfoMode, setOnboardingInfoMode] = useState(false);
+  const getPositionFnRef = useRef<((discordId: string) => ScreenPosition | null) | null>(null);
 
   const revealAll = useRevealedStore((state) => state.revealAll);
+  const { connected, onChatMessage } = useSocket();
+  const addMessage = useChatStore((state) => state.addMessage);
+
+  useEffect(() => {
+    return onChatMessage((message) => {
+      addMessage(message)
+    })
+  }, [onChatMessage, addMessage])
 
   // Mostrar onboarding solo en la primera visita (sin personajes descubiertos y sin flag de sesión)
   useEffect(() => {
@@ -166,6 +178,9 @@ export default function GaleriaV2Page() {
         onCharacterClick={setSelectedCharacter}
         focusCharacterId={focusCharacterId}
         onLogoClick={() => setIsLinksModalOpen(true)}
+        onPositionReady={(getPosition) => {
+          getPositionFnRef.current = getPosition
+        }}
       />
 
       <CharacterModal

@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "tsx watch server.ts --dev",
     "build": "next build",
-    "start": "next start"
+    "start": "tsx server.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1000.0",
@@ -15,11 +15,14 @@
     "@supabase/supabase-js": "^2.98.0",
     "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
+    "discord.js": "^14.26.4",
     "dotenv": "^16.4.5",
     "next": "16.1.6",
     "pixi.js": "^8.16.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "zustand": "^5.0.11"
   },
   "devDependencies": {

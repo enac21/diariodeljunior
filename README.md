@@ -1,6 +1,6 @@
 # Diario Del Junior - Web
 
-> Mapa interactivo de personajes generados a partir de seguidores de TikTok.
+> Mapa interactivo de personajes generados a partir de miembros del servidor de Discord.
 
 ---
 
@@ -8,11 +8,11 @@
 
 ### Descripción
 
-**Diario del Junior** es una plataforma que genera personajes únicos estilo Habbo para cada miembro de la comunidad. Cada seguidor de TikTok recibe un avatar procedural generado a partir de su ID, creando una experiencia visual interactiva con un mapa en tiempo real y una galería de personajes.
+**Diario del Junior** es una plataforma que genera personajes únicos estilo Habbo para cada miembro del servidor de Discord. Cada miembro recibe un avatar procedural generado a partir de su ID, creando una experiencia visual interactiva con un mapa en tiempo real, chat en vivo integrado y galería de personajes.
 
 ### Estado del Proyecto (Mayo 2026)
 
-**Versión actual:** v1.0.0
+**Versión actual:** v2.0.0
 
 ### Stack Tecnológico
 
@@ -26,11 +26,20 @@
 | **State Management** | Zustand 5 |
 | **Storage** | Supabase Storage (S3-compatible) |
 | **Tipado** | TypeScript 5.7 |
+| **Real-time** | Socket.io 4 |
+| **Bot** | Discord.js 14 |
 
 ### Estructura del Proyecto
 
 ```
 modular_model_generator/
+├── server.ts                      # Custom server: Next.js + Socket.io + Discord Bot
+├── bot/
+│   ├── config.ts                  # Configuración y validación de env vars del bot
+│   ├── client.ts                  # Cliente Discord.js + registro de eventos
+│   └── events/
+│       ├── guild-member-add.ts    # Sincronización automática de nuevos miembros
+│       └── message-create.ts      # Reenvío de mensajes de Discord al frontend vía Socket.io
 ├── app/
 │   ├── api/
 │   │   ├── auth/login/            # Endpoint de autenticación
@@ -54,7 +63,9 @@ modular_model_generator/
 │       ├── CharacterModal.tsx     # Modal de detalle de personaje
 │       ├── LinksModal.tsx         # Modal de enlaces sociales
 │       ├── OnboardingModal.tsx    # Modal de bienvenida en 3 pasos
-│       └── ClickRevealAvatar.tsx  # Avatar con revelado al clic + confetti
+│       ├── ClickRevealAvatar.tsx  # Avatar con revelado al clic + confetti
+│       ├── ChatOverlay.tsx        # Overlay de burbujas de chat en tiempo real
+│       └── ChatBubble.tsx         # Componente de burbuja individual estilo Habbo
 ├── lib/
 │   ├── character-generator.ts     # Lógica de generación Habbo + upload S3
 │   ├── character-agent.ts         # Agentes para posicionamiento en mapa
@@ -65,11 +76,14 @@ modular_model_generator/
 │   ├── api-utils.ts               # Utilidades de manejo de errores API
 │   ├── social-links.tsx           # Configuración de redes sociales
 │   ├── types/
-│   │   └── character.ts           # Tipos TypeScript de Character
+│   │   ├── character.ts           # Tipos TypeScript de Character
+│   │   └── chat.ts                # Tipos de mensajes de chat
 │   ├── stores/
-│   │   └── revealed-store.ts      # Zustand store para avatares revelados
+│   │   ├── revealed-store.ts      # Zustand store para avatares revelados
+│   │   └── chat-store.ts          # Zustand store para burbujas de chat (stack de 5)
 │   ├── hooks/
-│   │   └── useCharactersData.ts   # Hook para datos de personajes
+│   │   ├── useCharactersData.ts   # Hook para datos de personajes
+│   │   └── useSocket.ts           # Hook de conexión Socket.io con reconexión
 │   └── data/                      # JSONs de assets Habbo
 │       ├── male_head.json         # 94 opciones de cabeza (M)
 │       ├── female_head.json       # 94 opciones de cabeza (F)
@@ -98,6 +112,7 @@ modular_model_generator/
 ```prisma
 model Character {
   id               String   @id @default(uuid()) @db.Uuid
+  discordId        String?  @unique
   username         String
   seed             Int      @unique
   generatorVersion Int      @default(1)
@@ -121,6 +136,32 @@ model Character {
 | `/terms` | Términos de servicio |
 
 ### Funcionalidades Clave
+
+#### Bot de Discord
+
+El bot se integra directamente en el mismo proceso del servidor, gestionando dos flujos principales:
+
+**Sincronización automática de miembros:**
+- Escucha el evento `guildMemberAdd` en tiempo real
+- Cuando un nuevo miembro se une, llama a `POST /api/characters` automáticamente
+- Genera avatar procedural, lo sube a Supabase Storage y lo guarda en PostgreSQL
+- No hay fetch inicial de miembros al arrancar — todo es event-driven
+
+**Chat en tiempo real:**
+- Escucha `messageCreate` en canales configurados vía `ALLOWED_CHANNEL_IDS`
+- Ignora mensajes de bots automáticamente
+- Emite mensajes por Socket.io a todos los clientes conectados
+- Los mensajes aparecen como burbujas sobre los personajes en el mapa
+
+#### Chat en Tiempo Real (Burbujas sobre Personajes)
+
+Cada mensaje de Discord aparece como una burbuja de diálogo sobre el personaje correspondiente:
+
+- **Posicionamiento:** Las burbujas siguen al personaje con zoom/scroll del mapa (mismo `transform` que el world container de PixiJS)
+- **Apilamiento:** Hasta 5 mensajes por usuario, los nuevos aparecen más cerca del personaje
+- **Duración:** 15 segundos por mensaje con fade-out suave
+- **Estilo:** Fondo oscuro, borde amber, cola triangular centrada, nombre de canal en negrita
+- **Formato:** `#canal: contenido del mensaje`
 
 #### Generación de Personajes (Habbo)
 
@@ -157,7 +198,7 @@ https://www.habbo.fi/habbo-imaging/avatarimage
 // Body
 {
   "users": [
-    { "id": "123456789", "username": "nombre_usuario", "joinedAt": "2024-02-27T16:00:00.000Z" }
+    { "id": "123456789", "username": "nombre_usuario", "joinedAt": "2024-02-27T16:00:00.000Z", "discordId": "123456789" }
   ]
 }
 
@@ -216,6 +257,15 @@ PAGE_PASSWORD=password
 HABBO_BATCH_THRESHOLD=20
 HABBO_DELAY_SMALL_BATCH_MS=2500
 HABBO_DELAY_LARGE_BATCH_MS=25000
+
+# Discord Bot
+DISCORD_TOKEN=tu-token-de-bot
+GUILD_ID=id-del-servidor
+WEB_AUTH_TOKEN=mismo-valor-que-API_AUTH_TOKEN
+ALLOWED_CHANNEL_IDS=id-canal-1,id-canal-2,id-canal-3
+
+# Socket.io
+NEXT_PUBLIC_SOCKET_URL=http://localhost:3000
 ```
 
 ### Instalación y Desarrollo
@@ -248,15 +298,36 @@ npx prisma db push
 npx prisma generate
 
 # Desarrollo
-npm run dev
+npm run dev         # tsx watch server.ts --dev (Next.js + Socket.io + Bot)
 
 # Build producción
 npm run build
-npm run start
+npm run start       # tsx server.ts (único proceso: Next.js + Socket.io + Bot)
 ```
+
+### Despliegue en Render
+
+Un solo servicio always-on gestiona todo:
+
+**Build Command:** `next build`
+**Start Command:** `npm start` (ejecuta `tsx server.ts`)
+
+**Variables de entorno necesarias:**
+| Variable | Descripción |
+|---|---|
+| `DISCORD_TOKEN` | Token del bot de Discord |
+| `GUILD_ID` | ID del servidor de Discord |
+| `WEB_AUTH_TOKEN` | Token para autenticación de `/api/characters` |
+| `ALLOWED_CHANNEL_IDS` | IDs de canales permitidos (separados por coma) |
+| `NEXT_PUBLIC_SOCKET_URL` | URL pública de la app (ej: `https://tu-app.onrender.com`) |
+
+**Intents de Discord requeridos** (en Discord Developer Portal → Bot):
+- `SERVER MEMBERS INTENT` — para detectar nuevos miembros
+- `MESSAGE CONTENT INTENT` — para leer mensajes de chat
 
 ### Historial de Cambios
 
+- **[2026-05]:** v2.0.0 — Discord bot integrado, chat en tiempo real con burbujas sobre personajes, Socket.io, sincronización automática de miembros, campo `discordId`
 - **[2026-05]:** v1.0.0 — Lanzamiento estable con onboarding modal, sistema de revelado con confetti, rate limiting, y social links
 - **[2026-04-05]:** Tooltips CSS en navegación + fix de resiliencia ante fallo de BD en landing page
 - **[2026-02]:** v0.2.0 — Migración a Habbo Imaging + Supabase Storage
@@ -268,11 +339,11 @@ npm run start
 
 ### Description
 
-**Diario del Junior** is a platform that generates unique Habbo-style characters for each community member. Every TikTok follower receives a procedural avatar generated from their ID, creating an interactive visual experience with a real-time map and character gallery.
+**Diario del Junior** is a platform that generates unique Habbo-style characters for each Discord server member. Every member receives a procedural avatar generated from their ID, creating an interactive visual experience with a real-time map, live chat integration, and character gallery.
 
 ### Project Status (May 2026)
 
-**Current version:** v1.0.0
+**Current version:** v2.0.0
 
 ### Tech Stack
 
@@ -286,8 +357,36 @@ npm run start
 | **State Management** | Zustand 5 |
 | **Storage** | Supabase Storage (S3-compatible) |
 | **Typing** | TypeScript 5.7 |
+| **Real-time** | Socket.io 4 |
+| **Bot** | Discord.js 14 |
 
 ### Key Features
+
+#### Discord Bot
+
+The bot is integrated directly into the same server process, managing two main flows:
+
+**Automatic member synchronization:**
+- Listens to `guildMemberAdd` event in real time
+- When a new member joins, automatically calls `POST /api/characters`
+- Generates procedural avatar, uploads to Supabase Storage, and saves to PostgreSQL
+- No initial member fetch on startup — everything is event-driven
+
+**Real-time chat:**
+- Listens to `messageCreate` on channels configured via `ALLOWED_CHANNEL_IDS`
+- Ignores bot messages automatically
+- Emits messages via Socket.io to all connected clients
+- Messages appear as bubbles over characters on the map
+
+#### Real-time Chat (Bubbles over Characters)
+
+Each Discord message appears as a speech bubble over the corresponding character:
+
+- **Positioning:** Bubbles follow the character with map zoom/scroll (same `transform` as PixiJS world container)
+- **Stacking:** Up to 5 messages per user, newest appear closest to the character
+- **Duration:** 15 seconds per message with smooth fade-out
+- **Style:** Dark background, amber border, centered tail, channel name in bold
+- **Format:** `#channel: message content`
 
 #### Character Generation (Habbo)
 
@@ -386,6 +485,15 @@ PAGE_PASSWORD=password
 HABBO_BATCH_THRESHOLD=20
 HABBO_DELAY_SMALL_BATCH_MS=2500
 HABBO_DELAY_LARGE_BATCH_MS=25000
+
+# Discord Bot
+DISCORD_TOKEN=your-discord-bot-token
+GUILD_ID=your-discord-guild-id
+WEB_AUTH_TOKEN=same-as-API_AUTH_TOKEN
+ALLOWED_CHANNEL_IDS=channel-id-1,channel-id-2,channel-id-3
+
+# Socket.io
+NEXT_PUBLIC_SOCKET_URL=http://localhost:3000
 ```
 
 ### Installation & Development
@@ -418,15 +526,36 @@ npx prisma db push
 npx prisma generate
 
 # Development
-npm run dev
+npm run dev         # tsx watch server.ts --dev (Next.js + Socket.io + Bot)
 
 # Production build
 npm run build
-npm run start
+npm run start       # tsx server.ts (single process: Next.js + Socket.io + Bot)
 ```
+
+### Deploying on Render
+
+A single always-on service handles everything:
+
+**Build Command:** `next build`
+**Start Command:** `npm start` (runs `tsx server.ts`)
+
+**Required environment variables:**
+| Variable | Description |
+|---|---|
+| `DISCORD_TOKEN` | Discord bot token |
+| `GUILD_ID` | Discord server ID |
+| `WEB_AUTH_TOKEN` | Auth token for `/api/characters` |
+| `ALLOWED_CHANNEL_IDS` | Allowed channel IDs (comma-separated) |
+| `NEXT_PUBLIC_SOCKET_URL` | Public app URL (e.g., `https://tu-app.onrender.com`) |
+
+**Required Discord Intents** (in Discord Developer Portal → Bot):
+- `SERVER MEMBERS INTENT` — to detect new members
+- `MESSAGE CONTENT INTENT` — to read chat messages
 
 ### Changelog
 
+- **[2026-05]:** v2.0.0 — Integrated Discord bot, real-time chat with character bubbles, Socket.io, automatic member sync, `discordId` field
 - **[2026-05]:** v1.0.0 — Stable release with onboarding modal, confetti reveal system, rate limiting, and social links
 - **[2026-04-05]:** CSS tooltips on navigation + BD failure resilience fix on landing page
 - **[2026-02]:** v0.2.0 — Migration to Habbo Imaging + Supabase Storage
